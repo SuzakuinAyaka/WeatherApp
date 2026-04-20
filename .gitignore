@@ -2,7 +2,7 @@
 .gradle/
 .gradle-user/
 /local.properties
-.idea
+/.idea/
 .DS_Store
 /build
 /app/build/
