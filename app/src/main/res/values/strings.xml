@@ -1,3 +1,33 @@
 <resources>
     <string name="app_name">WeatherApp</string>
+    <string name="login_title">登录</string>
+    <string name="register_title">注册</string>
+    <string name="reset_password_title">重置密码</string>
+    <string name="main_title">天气主页</string>
+    <string name="add_city_title">添加城市</string>
+    <string name="settings_title">设置</string>
+    <string name="details_title">今日详情</string>
+    <string name="hint_username">用户名</string>
+    <string name="hint_password">密码</string>
+    <string name="hint_email">邮箱</string>
+    <string name="hint_phone">手机号</string>
+    <string name="hint_confirm_password">确认密码</string>
+    <string name="label_identity">邮箱或手机号</string>
+    <string name="action_login">登录</string>
+    <string name="action_register">注册</string>
+    <string name="action_reset_password">重置密码</string>
+    <string name="action_to_register">没有账号？去注册</string>
+    <string name="action_to_reset_password">忘记密码</string>
+    <string name="action_save">保存</string>
+    <string name="action_open_settings">设置</string>
+    <string name="action_add_city">添加城市</string>
+    <string name="action_view_details">查看天气详情</string>
+    <string name="action_logout">退出登录</string>
+    <string name="empty_saved_cities">还没有保存城市</string>
+    <string name="empty_forecast">未来天气列表待接入</string>
+    <string name="empty_city_search">城市搜索结果待接入</string>
+    <string name="placeholder_main_weather">当前为项目骨架阶段，天气展示与 API 将在后续接入。</string>
+    <string name="placeholder_details">详情页骨架已创建，后续接入实时天气字段展示。</string>
+    <string name="placeholder_settings">这里将放置退出登录、主题与缓存设置。</string>
+    <string name="placeholder_add_city">搜索与添加城市功能将在下一阶段接入。</string>
 </resources>
