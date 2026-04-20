@@ -1,10 +1,12 @@
 package com.dengyy.weatherapp.ui;
 
 import android.content.Intent;
+import android.graphics.Rect;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Patterns;
 import android.view.View;
+import android.widget.ScrollView;
 
 import com.dengyy.weatherapp.R;
 import com.dengyy.weatherapp.repository.UserRepository;
@@ -52,6 +54,7 @@ public class RegisterActivity extends BaseActivity {
         emailInput = findViewById(R.id.input_email);
         MaterialButton registerButton = findViewById(R.id.button_register);
         MaterialButton backToLoginButton = findViewById(R.id.button_back_to_login);
+        ScrollView scrollView = findViewById(R.id.root_container);
 
         FormUiUtils.bindFieldBehavior(
                 accountLayout,
@@ -89,6 +92,7 @@ public class RegisterActivity extends BaseActivity {
         FormUiUtils.moveFocusOnEditorAction(confirmPasswordInput, emailInput);
         FormUiUtils.submitOnEditorAction(emailInput, this::attemptRegister);
         FormUiUtils.clearFocusWhenTapOutside(rootView, accountInput, phoneInput, passwordInput, confirmPasswordInput, emailInput);
+        setupInputAutoScroll(scrollView, accountInput, phoneInput, passwordInput, confirmPasswordInput, emailInput);
 
         registerButton.setOnClickListener(v -> attemptRegister());
         backToLoginButton.setOnClickListener(v -> finish());
@@ -172,5 +176,35 @@ public class RegisterActivity extends BaseActivity {
 
     private void showMessage(String message) {
         Snackbar.make(findViewById(android.R.id.content), message, Snackbar.LENGTH_SHORT).show();
+    }
+
+    private void setupInputAutoScroll(ScrollView scrollView, View... inputs) {
+        for (View input : inputs) {
+            input.setOnFocusChangeListener((v, hasFocus) -> {
+                if (hasFocus) {
+                    scrollFocusedInputIntoView(scrollView, v);
+                }
+            });
+        }
+    }
+
+    private void scrollFocusedInputIntoView(ScrollView scrollView, View targetView) {
+        scrollView.postDelayed(() -> {
+            Rect visibleFrame = new Rect();
+            Rect targetFrame = new Rect();
+            scrollView.getWindowVisibleDisplayFrame(visibleFrame);
+            targetView.getGlobalVisibleRect(targetFrame);
+
+            int bottomMargin = dpToPx(20);
+            if (targetFrame.bottom > visibleFrame.bottom - bottomMargin) {
+                int delta = targetFrame.bottom - (visibleFrame.bottom - bottomMargin);
+                scrollView.smoothScrollBy(0, delta);
+            }
+        }, 180);
+    }
+
+    private int dpToPx(int dp) {
+        float density = getResources().getDisplayMetrics().density;
+        return Math.round(dp * density);
     }
 }
