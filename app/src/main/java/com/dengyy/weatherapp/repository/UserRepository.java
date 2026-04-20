@@ -12,6 +12,24 @@ import com.dengyy.weatherapp.utils.SPUtils;
 
 public class UserRepository {
 
+    public enum LoginResult {
+        SUCCESS,
+        USER_NOT_FOUND,
+        WRONG_PASSWORD
+    }
+
+    public enum RegisterResult {
+        SUCCESS,
+        USERNAME_EXISTS,
+        INVALID_INPUT
+    }
+
+    public enum ResetPasswordResult {
+        SUCCESS,
+        USER_NOT_FOUND,
+        IDENTITY_MISMATCH
+    }
+
     private final UserDao userDao;
     private final Context appContext;
 
@@ -20,10 +38,14 @@ public class UserRepository {
         this.userDao = new UserDao(appContext);
     }
 
-    public long register(String username, String password, String email, String phone) {
-        if (TextUtils.isEmpty(username) || TextUtils.isEmpty(password) || userDao.existsByUsername(username)) {
-            return -1;
+    public RegisterResult register(String username, String password, String email, String phone) {
+        if (TextUtils.isEmpty(username) || TextUtils.isEmpty(password)) {
+            return RegisterResult.INVALID_INPUT;
         }
+        if (userDao.existsByUsername(username)) {
+            return RegisterResult.USERNAME_EXISTS;
+        }
+
         long now = System.currentTimeMillis();
         User user = new User();
         user.setUsername(username.trim());
@@ -32,28 +54,39 @@ public class UserRepository {
         user.setPhone(phone);
         user.setCreatedAt(now);
         user.setUpdatedAt(now);
-        return userDao.insert(user);
+
+        long rowId = userDao.insert(user);
+        return rowId > 0 ? RegisterResult.SUCCESS : RegisterResult.INVALID_INPUT;
     }
 
-    public boolean login(String username, String password) {
+    public LoginResult login(String username, String password) {
         User user = userDao.findByUsername(username);
         if (user == null) {
-            return false;
+            return LoginResult.USER_NOT_FOUND;
         }
+
         String passwordHash = MD5Utils.hash(password);
         if (!passwordHash.equals(user.getPassword())) {
-            return false;
+            return LoginResult.WRONG_PASSWORD;
         }
+
         SPUtils.saveLoginUser(appContext, user.getId(), user.getUsername());
-        return true;
+        return LoginResult.SUCCESS;
     }
 
-    public boolean resetPassword(String username, String identity, String newPassword) {
-        User user = userDao.findByIdentity(username, identity);
+    public ResetPasswordResult resetPassword(String username, String identity, String newPassword) {
+        User user = userDao.findByUsername(username);
         if (user == null) {
-            return false;
+            return ResetPasswordResult.USER_NOT_FOUND;
         }
-        return userDao.updatePassword(user.getId(), MD5Utils.hash(newPassword));
+
+        boolean matched = TextUtils.equals(identity, user.getEmail()) || TextUtils.equals(identity, user.getPhone());
+        if (!matched) {
+            return ResetPasswordResult.IDENTITY_MISMATCH;
+        }
+
+        boolean success = userDao.updatePassword(user.getId(), MD5Utils.hash(newPassword));
+        return success ? ResetPasswordResult.SUCCESS : ResetPasswordResult.IDENTITY_MISMATCH;
     }
 
     public boolean isLoggedIn() {

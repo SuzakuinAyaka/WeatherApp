@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="md_theme_primary">#9EC9E7</color>
+    <color name="md_theme_onPrimary">#08304A</color>
+    <color name="md_theme_primaryContainer">#224A66</color>
+    <color name="md_theme_onPrimaryContainer">#D0E4F3</color>
+    <color name="md_theme_secondary">#B6CCE0</color>
+    <color name="md_theme_onSecondary">#203341</color>
+    <color name="md_theme_secondaryContainer">#364A59</color>
+    <color name="md_theme_onSecondaryContainer">#DCEAF5</color>
+    <color name="md_theme_surface">#0E1720</color>
+    <color name="md_theme_onSurface">#E4EDF4</color>
+    <color name="md_theme_surfaceVariant">#26323C</color>
+    <color name="md_theme_onSurfaceVariant">#B4C2CC</color>
+    <color name="md_theme_outline">#8E9CA8</color>
+    <color name="auth_bg_start">#122433</color>
+    <color name="auth_bg_center">#132E40</color>
+    <color name="auth_bg_end">#0E1720</color>
+    <color name="auth_card_surface">#16222C</color>
+    <color name="auth_highlight">#7AB5DC</color>
+</resources>

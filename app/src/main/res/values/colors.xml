@@ -2,4 +2,22 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="md_theme_primary">#3A6A8C</color>
+    <color name="md_theme_onPrimary">#FFFFFF</color>
+    <color name="md_theme_primaryContainer">#D0E4F3</color>
+    <color name="md_theme_onPrimaryContainer">#0E2738</color>
+    <color name="md_theme_secondary">#6A8CA6</color>
+    <color name="md_theme_onSecondary">#FFFFFF</color>
+    <color name="md_theme_secondaryContainer">#DCEAF5</color>
+    <color name="md_theme_onSecondaryContainer">#162733</color>
+    <color name="md_theme_surface">#F7FAFD</color>
+    <color name="md_theme_onSurface">#18232D</color>
+    <color name="md_theme_surfaceVariant">#E6EEF4</color>
+    <color name="md_theme_onSurfaceVariant">#4D5C68</color>
+    <color name="md_theme_outline">#7A8A96</color>
+    <color name="auth_bg_start">#A8D4F0</color>
+    <color name="auth_bg_center">#DCEFF8</color>
+    <color name="auth_bg_end">#F7FBFE</color>
+    <color name="auth_card_surface">#F9FCFF</color>
+    <color name="auth_highlight">#5F9BC2</color>
 </resources>
