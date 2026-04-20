@@ -3,7 +3,11 @@ package com.dengyy.weatherapp.ui;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
+import android.widget.EditText;
+import android.widget.TextView;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -11,20 +15,17 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import com.dengyy.weatherapp.R;
 import com.dengyy.weatherapp.repository.UserRepository;
 import com.dengyy.weatherapp.utils.FormUiUtils;
-import com.google.android.material.button.MaterialButton;
 import com.google.android.material.snackbar.Snackbar;
-import com.google.android.material.textfield.TextInputEditText;
-import com.google.android.material.textfield.TextInputLayout;
 
 public class LoginActivity extends BaseActivity {
 
     public static final String EXTRA_USERNAME = "extra_username";
 
     private UserRepository userRepository;
-    private TextInputLayout accountLayout;
-    private TextInputLayout passwordLayout;
-    private TextInputEditText accountInput;
-    private TextInputEditText passwordInput;
+    private EditText accountInput;
+    private EditText passwordInput;
+    private TextView accountErrorView;
+    private TextView passwordErrorView;
     private ActivityResultLauncher<Intent> registerLauncher;
 
     @Override
@@ -68,29 +69,19 @@ public class LoginActivity extends BaseActivity {
 
     private void initViews() {
         View rootView = findViewById(R.id.root_container);
-        accountLayout = findViewById(R.id.layout_account);
-        passwordLayout = findViewById(R.id.layout_password);
         accountInput = findViewById(R.id.input_account);
         passwordInput = findViewById(R.id.input_password);
-        MaterialButton loginButton = findViewById(R.id.button_login);
-        MaterialButton registerButton = findViewById(R.id.button_to_register);
-        MaterialButton resetPasswordButton = findViewById(R.id.button_to_reset_password);
+        accountErrorView = findViewById(R.id.text_error_account);
+        passwordErrorView = findViewById(R.id.text_error_password);
+        View loginButton = findViewById(R.id.button_login);
+        TextView registerButton = findViewById(R.id.button_to_register);
+        TextView resetPasswordButton = findViewById(R.id.button_to_reset_password);
 
-        FormUiUtils.bindFieldBehavior(
-                accountLayout,
-                accountInput,
-                getString(R.string.label_account),
-                getString(R.string.hint_account_input)
-        );
-        FormUiUtils.bindFieldBehavior(
-                passwordLayout,
-                passwordInput,
-                getString(R.string.label_password),
-                getString(R.string.hint_password_input)
-        );
         FormUiUtils.moveFocusOnEditorAction(accountInput, passwordInput);
         FormUiUtils.submitOnEditorAction(passwordInput, this::attemptLogin);
         FormUiUtils.clearFocusWhenTapOutside(rootView, accountInput, passwordInput);
+        addErrorClearWatcher(accountInput);
+        addErrorClearWatcher(passwordInput);
 
         loginButton.setOnClickListener(v -> attemptLogin());
         registerButton.setOnClickListener(v -> registerLauncher.launch(new Intent(this, RegisterActivity.class)));
@@ -104,11 +95,11 @@ public class LoginActivity extends BaseActivity {
 
         boolean hasError = false;
         if (TextUtils.isEmpty(account)) {
-            accountLayout.setError(getString(R.string.error_account_required));
+            showFieldError(accountInput, accountErrorView, getString(R.string.error_account_required));
             hasError = true;
         }
         if (TextUtils.isEmpty(password)) {
-            passwordLayout.setError(getString(R.string.error_password_required));
+            showFieldError(passwordInput, passwordErrorView, getString(R.string.error_password_required));
             hasError = true;
         }
         if (hasError) {
@@ -122,9 +113,9 @@ public class LoginActivity extends BaseActivity {
             return;
         }
         if (result == UserRepository.LoginResult.USER_NOT_FOUND) {
-            accountLayout.setError(getString(R.string.error_user_not_found));
+            showFieldError(accountInput, accountErrorView, getString(R.string.error_user_not_found));
         } else {
-            passwordLayout.setError(getString(R.string.error_password_incorrect));
+            showFieldError(passwordInput, passwordErrorView, getString(R.string.error_password_incorrect));
         }
         showMessage(getString(R.string.message_login_failed));
     }
@@ -140,15 +131,48 @@ public class LoginActivity extends BaseActivity {
     }
 
     private void clearErrors() {
-        accountLayout.setError(null);
-        passwordLayout.setError(null);
+        hideFieldError(accountInput, accountErrorView);
+        hideFieldError(passwordInput, passwordErrorView);
     }
 
-    private String getText(TextInputEditText editText) {
+    private String getText(EditText editText) {
         return editText.getText() == null ? "" : editText.getText().toString().trim();
+    }
+
+    private void addErrorClearWatcher(EditText editText) {
+        editText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (editText == accountInput) {
+                    hideFieldError(accountInput, accountErrorView);
+                } else if (editText == passwordInput) {
+                    hideFieldError(passwordInput, passwordErrorView);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+        });
     }
 
     private void showMessage(String message) {
         Snackbar.make(findViewById(android.R.id.content), message, Snackbar.LENGTH_SHORT).show();
+    }
+
+    private void showFieldError(EditText editText, TextView errorView, String message) {
+        errorView.setText(message);
+        errorView.setVisibility(View.VISIBLE);
+        editText.setActivated(true);
+    }
+
+    private void hideFieldError(EditText editText, TextView errorView) {
+        errorView.setText(null);
+        errorView.setVisibility(View.GONE);
+        editText.setActivated(false);
     }
 }

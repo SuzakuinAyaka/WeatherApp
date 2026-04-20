@@ -57,8 +57,8 @@ public final class FormUiUtils {
     }
 
     public static void moveFocusOnEditorAction(
-            TextInputEditText currentEditText,
-            TextInputEditText nextEditText
+            TextView currentEditText,
+            View nextEditText
     ) {
         currentEditText.setOnEditorActionListener((TextView v, int actionId, KeyEvent event) -> {
             boolean isEnterKey =
@@ -76,7 +76,7 @@ public final class FormUiUtils {
         });
     }
 
-    public static void submitOnEditorAction(TextInputEditText editText, Runnable action) {
+    public static void submitOnEditorAction(TextView editText, Runnable action) {
         editText.setOnEditorActionListener((TextView v, int actionId, KeyEvent event) -> {
             boolean isEnterKey =
                     event != null
@@ -92,12 +92,12 @@ public final class FormUiUtils {
         });
     }
 
-    public static void showKeyboard(TextInputEditText editText) {
-        Context context = editText.getContext();
+    public static void showKeyboard(View view) {
+        Context context = view.getContext();
         InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
         if (imm != null) {
-            editText.requestFocus();
-            imm.showSoftInput(editText, InputMethodManager.SHOW_IMPLICIT);
+            view.requestFocus();
+            imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
         }
     }
 }

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:angle="270"
+                android:startColor="@color/login_bg_top"
+                android:centerColor="@color/login_bg_mid"
+                android:endColor="@color/login_bg_bottom" />
+        </shape>
+    </item>
+
+    <item
+        android:top="-120dp"
+        android:left="-80dp">
+        <shape android:shape="oval">
+            <size
+                android:width="280dp"
+                android:height="280dp" />
+            <solid android:color="@color/login_blob_primary" />
+        </shape>
+    </item>
+
+    <item
+        android:gravity="top|end"
+        android:top="40dp"
+        android:right="-36dp">
+        <shape android:shape="oval">
+            <size
+                android:width="200dp"
+                android:height="200dp" />
+            <solid android:color="@color/login_blob_secondary" />
+        </shape>
+    </item>
+
+    <item
+        android:gravity="bottom|start"
+        android:bottom="100dp"
+        android:left="-56dp">
+        <shape android:shape="oval">
+            <size
+                android:width="180dp"
+                android:height="180dp" />
+            <solid android:color="@color/login_blob_accent" />
+        </shape>
+    </item>
+
+    <item
+        android:gravity="bottom|end"
+        android:bottom="-90dp"
+        android:right="-40dp">
+        <shape android:shape="oval">
+            <size
+                android:width="220dp"
+                android:height="220dp" />
+            <solid android:color="@color/login_blob_primary" />
+        </shape>
+    </item>
+</layer-list>

@@ -16,6 +16,8 @@
     <string name="label_email_optional">邮箱（可选）</string>
     <string name="hint_account_input">请输入账号</string>
     <string name="hint_password_input">请输入密码</string>
+    <string name="hint_enter_account">请输入账号</string>
+    <string name="hint_enter_password">请输入密码</string>
     <string name="hint_confirm_password_input">请再次输入密码</string>
     <string name="hint_identity_input">请输入注册时填写的邮箱或手机号</string>
     <string name="hint_email_input">请输入邮箱</string>

@@ -2,14 +2,13 @@ package com.dengyy.weatherapp.ui;
 
 import android.view.View;
 import android.view.ViewTreeObserver;
+import android.widget.EditText;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
-
-import com.google.android.material.textfield.TextInputEditText;
 
 public abstract class BaseActivity extends AppCompatActivity {
 
@@ -29,7 +28,7 @@ public abstract class BaseActivity extends AppCompatActivity {
                 new ViewTreeObserver.OnGlobalFocusChangeListener() {
                     @Override
                     public void onGlobalFocusChanged(View oldFocus, View newFocus) {
-                        if (newFocus instanceof TextInputEditText) {
+                        if (isInputField(newFocus)) {
                             lastInputFocusChangedAt = System.currentTimeMillis();
                             cancelPendingClearFocus(rootView);
                         }
@@ -55,7 +54,7 @@ public abstract class BaseActivity extends AppCompatActivity {
             View currentFocus = getCurrentFocus();
             if (imeVisible) {
                 cancelPendingClearFocus(view);
-            } else if (currentFocus instanceof TextInputEditText) {
+            } else if (isInputField(currentFocus)) {
                 scheduleClearFocus(view, currentFocus);
             }
             return insets;
@@ -73,7 +72,7 @@ public abstract class BaseActivity extends AppCompatActivity {
             if (imeStillHidden
                     && !withinGracePeriod
                     && latestFocus == focusedView
-                    && latestFocus instanceof TextInputEditText) {
+                    && isInputField(latestFocus)) {
                 latestFocus.clearFocus();
             }
         };
@@ -85,5 +84,9 @@ public abstract class BaseActivity extends AppCompatActivity {
             rootView.removeCallbacks(pendingClearFocusRunnable);
             pendingClearFocusRunnable = null;
         }
+    }
+
+    private boolean isInputField(View view) {
+        return view instanceof EditText;
     }
 }

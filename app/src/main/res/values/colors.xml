@@ -20,4 +20,23 @@
     <color name="auth_bg_end">#F7FBFE</color>
     <color name="auth_card_surface">#F9FCFF</color>
     <color name="auth_highlight">#5F9BC2</color>
+    <color name="login_bg_top">#8EC5E8</color>
+    <color name="login_bg_mid">#CFE9F5</color>
+    <color name="login_bg_bottom">#F7FBFE</color>
+    <color name="login_blob_primary">#66FFFFFF</color>
+    <color name="login_blob_secondary">#3D8BC3D9</color>
+    <color name="login_blob_accent">#4DAED9B6</color>
+    <color name="login_glass_surface">#BFFBFEFF</color>
+    <color name="login_glass_stroke">#80FFFFFF</color>
+    <color name="login_input_surface">#99FFFFFF</color>
+    <color name="login_input_text">#173246</color>
+    <color name="login_input_hint">#6A8191</color>
+    <color name="login_input_stroke">#73A7C8</color>
+    <color name="login_input_stroke_focused">#2D6F98</color>
+    <color name="login_input_icon">#5D7D92</color>
+    <color name="login_error_text">#A32921</color>
+    <color name="login_button_surface">#AA2E6E95</color>
+    <color name="login_button_stroke">#80FFFFFF</color>
+    <color name="login_text_button">#27506B</color>
+    <color name="login_text_button_ripple">#33FFFFFF</color>
 </resources>
