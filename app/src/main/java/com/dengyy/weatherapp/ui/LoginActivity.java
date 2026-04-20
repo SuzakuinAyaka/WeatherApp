@@ -1,6 +1,8 @@
 package com.dengyy.weatherapp.ui;
 
 import android.content.Intent;
+import android.graphics.LinearGradient;
+import android.graphics.Shader;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.text.Editable;
@@ -26,6 +28,7 @@ public class LoginActivity extends BaseActivity {
     private EditText passwordInput;
     private TextView accountErrorView;
     private TextView passwordErrorView;
+    private TextView titleView;
     private ActivityResultLauncher<Intent> registerLauncher;
 
     @Override
@@ -69,6 +72,7 @@ public class LoginActivity extends BaseActivity {
 
     private void initViews() {
         View rootView = findViewById(R.id.root_container);
+        titleView = findViewById(R.id.text_login_title);
         accountInput = findViewById(R.id.input_account);
         passwordInput = findViewById(R.id.input_password);
         accountErrorView = findViewById(R.id.text_error_account);
@@ -82,6 +86,7 @@ public class LoginActivity extends BaseActivity {
         FormUiUtils.clearFocusWhenTapOutside(rootView, accountInput, passwordInput);
         addErrorClearWatcher(accountInput);
         addErrorClearWatcher(passwordInput);
+        applyTitleGradient();
 
         loginButton.setOnClickListener(v -> attemptLogin());
         registerButton.setOnClickListener(v -> registerLauncher.launch(new Intent(this, RegisterActivity.class)));
@@ -162,6 +167,37 @@ public class LoginActivity extends BaseActivity {
 
     private void showMessage(String message) {
         Snackbar.make(findViewById(android.R.id.content), message, Snackbar.LENGTH_SHORT).show();
+    }
+
+    private void applyTitleGradient() {
+        if (titleView == null) {
+            return;
+        }
+        titleView.post(() -> {
+            float width = Math.max(titleView.getMeasuredWidth(), 1);
+            Shader shader = new LinearGradient(
+                    0,
+                    0,
+                    width,
+                    titleView.getTextSize(),
+                    new int[]{
+                            getColor(R.color.login_title_sunrise),
+                            getColor(R.color.login_title_sun),
+                            getColor(R.color.login_title_sun),
+                            getColor(R.color.login_title_orange)
+                    },
+                    new float[]{0f, 0.34f, 0.68f, 1f},
+                    Shader.TileMode.CLAMP
+            );
+            titleView.getPaint().setShader(shader);
+            titleView.setShadowLayer(
+                    18f,
+                    0f,
+                    6f,
+                    getColor(R.color.login_title_shadow)
+            );
+            titleView.invalidate();
+        });
     }
 
     private void showFieldError(EditText editText, TextView errorView, String message) {

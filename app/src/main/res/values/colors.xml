@@ -25,7 +25,14 @@
     <color name="login_bg_bottom">#F7FBFE</color>
     <color name="login_blob_primary">#66FFFFFF</color>
     <color name="login_blob_secondary">#3D8BC3D9</color>
-    <color name="login_blob_accent">#4DAED9B6</color>
+    <color name="login_blob_accent">#4DFFD7A1</color>
+    <color name="login_title_sky">#289FE4</color>
+    <color name="login_title_sky_soft">#5FC3F5</color>
+    <color name="login_title_sunrise">#E8864B</color>
+    <color name="login_title_sun">#E9B84A</color>
+    <color name="login_title_orange">#D9963F</color>
+    <color name="login_title_sky_warm">#93D3FF</color>
+    <color name="login_title_shadow">#66D97A28</color>
     <color name="login_glass_surface">#BFFBFEFF</color>
     <color name="login_glass_stroke">#80FFFFFF</color>
     <color name="login_input_surface">#99FFFFFF</color>
