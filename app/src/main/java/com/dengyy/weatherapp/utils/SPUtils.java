@@ -23,7 +23,32 @@ public final class SPUtils {
     }
 
     public static void clearLoginUser(Context context) {
-        getPreferences(context).edit().clear().apply();
+        SharedPreferences preferences = getPreferences(context);
+        boolean followSystem = isThemeFollowSystem(context);
+        int themeMode = getThemeMode(context);
+        preferences.edit().clear().apply();
+        setThemeFollowSystem(context, followSystem);
+        setThemeMode(context, themeMode);
+    }
+
+    public static void setThemeFollowSystem(Context context, boolean followSystem) {
+        getPreferences(context).edit()
+                .putBoolean(Constants.SP_KEY_THEME_FOLLOW_SYSTEM, followSystem)
+                .apply();
+    }
+
+    public static boolean isThemeFollowSystem(Context context) {
+        return getPreferences(context).getBoolean(Constants.SP_KEY_THEME_FOLLOW_SYSTEM, true);
+    }
+
+    public static void setThemeMode(Context context, int themeMode) {
+        getPreferences(context).edit()
+                .putInt(Constants.SP_KEY_THEME_MODE, themeMode)
+                .apply();
+    }
+
+    public static int getThemeMode(Context context) {
+        return getPreferences(context).getInt(Constants.SP_KEY_THEME_MODE, 0);
     }
 
     private static SharedPreferences getPreferences(Context context) {

@@ -7,6 +7,7 @@
     <string name="add_city_title">添加城市</string>
     <string name="settings_title">设置</string>
     <string name="details_title">今日详情</string>
+
     <string name="label_account">账号</string>
     <string name="label_password">密码</string>
     <string name="label_new_password">新密码</string>
@@ -14,6 +15,7 @@
     <string name="label_identity">邮箱或手机号</string>
     <string name="label_phone">手机号</string>
     <string name="label_email_optional">邮箱（可选）</string>
+
     <string name="hint_account_input">请输入账号</string>
     <string name="hint_password_input">请输入密码</string>
     <string name="hint_enter_account">请输入账号</string>
@@ -22,6 +24,7 @@
     <string name="hint_identity_input">请输入注册时填写的邮箱或手机号</string>
     <string name="hint_email_input">请输入邮箱</string>
     <string name="hint_phone_input">请输入手机号</string>
+
     <string name="action_login">登录</string>
     <string name="action_register">注册</string>
     <string name="action_reset_password">重置密码</string>
@@ -33,23 +36,34 @@
     <string name="action_add_city">添加城市</string>
     <string name="action_view_details">查看天气详情</string>
     <string name="action_logout">退出登录</string>
+    <string name="action_refresh">刷新</string>
+    <string name="action_back">返回</string>
+    <string name="action_cancel">取消</string>
+    <string name="action_confirm_logout">确认退出</string>
+
     <string name="empty_saved_cities">还没有保存城市</string>
     <string name="empty_forecast">未来天气列表待接入</string>
     <string name="empty_city_search">城市搜索结果待接入</string>
-    <string name="placeholder_main_weather">当前为项目骨架阶段，天气展示与 API 将在后续接入。</string>
+    <string name="placeholder_main_weather">当前为项目骨架阶段，天气展示 API 将在后续接入。</string>
     <string name="placeholder_details">详情页骨架已创建，后续接入实时天气字段展示。</string>
     <string name="placeholder_settings">这里将放置退出登录、主题与缓存设置。</string>
     <string name="placeholder_add_city">搜索与添加城市功能将在下一阶段接入。</string>
+
     <string name="auth_login_headline">欢迎回来</string>
     <string name="auth_login_subtitle">输入账号和密码即可继续查看你的天气主页。</string>
     <string name="auth_register_headline">创建账号</string>
-    <string name="auth_register_subtitle">先完成账号和密码设置，邮箱与手机号可以稍后补充。</string>
+    <string name="auth_register_subtitle">先完成账号和密码设置，邮箱与手机号可在后续完善。</string>
     <string name="auth_reset_headline">找回密码</string>
     <string name="auth_reset_subtitle">使用账号加邮箱或手机号校验身份后重置密码。</string>
+
     <string name="message_login_failed">登录失败，请检查输入信息</string>
     <string name="message_register_success">注册成功，账号已回填到登录页</string>
     <string name="message_register_failed">注册失败，请稍后重试</string>
     <string name="message_reset_password_success">密码已重置，请使用新密码登录</string>
+    <string name="message_main_refreshed">天气信息已刷新</string>
+    <string name="message_city_switched">已切换到 %1$s</string>
+    <string name="message_logout_success">已退出登录</string>
+
     <string name="error_account_required">请输入账号</string>
     <string name="error_account_too_short">账号至少 3 位</string>
     <string name="error_account_exists">该账号已存在</string>
@@ -63,7 +77,61 @@
     <string name="error_identity_not_match">邮箱或手机号与该账号不匹配</string>
     <string name="error_user_not_found">账号不存在</string>
     <string name="error_password_incorrect">密码错误</string>
+
     <string name="title_auth_back">返回</string>
     <string name="optional_section_title">可选信息</string>
     <string name="optional_section_desc">用于后续找回密码，不填写也可以先完成注册。</string>
+
+    <string name="main_drawer_desc">打开城市侧边栏</string>
+    <string name="main_city_overview">今日天气</string>
+    <string name="main_weather_metrics">体感概览</string>
+    <string name="main_forecast_title">未来 4 天</string>
+    <string name="main_sidebar_title">已添加城市</string>
+    <string name="main_sidebar_subtitle">切换城市后，主页天气会同步刷新。</string>
+    <string name="main_sidebar_status">保持天气更新，出门更从容。</string>
+    <string name="main_welcome_back">欢迎回来，%1$s</string>
+    <string name="main_user_fallback">游客</string>
+    <string name="main_default_city">北京</string>
+    <string name="main_default_province">北京</string>
+    <string name="main_weather_updated_at">更新时间 %1$s</string>
+    <string name="main_temperature_unit">%1$s°</string>
+    <string name="main_high_low">最高 %1$s° / 最低 %2$s°</string>
+    <string name="main_humidity_value">湿度 %1$s%%</string>
+    <string name="main_wind_value">%1$s  %2$s</string>
+    <string name="main_city_tag_current">当前城市</string>
+    <string name="main_city_tag_saved">已保存</string>
+    <string name="main_drawer_city_count">%1$d 个已保存城市</string>
+    <string name="main_view_details_cta">查看今日详情</string>
+    <string name="main_refreshing">正在更新天气数据…</string>
+
+    <string name="settings_profile_title">账号信息</string>
+    <string name="settings_profile_subtitle">当前登录账号与默认城市</string>
+    <string name="settings_general_title">通用设置</string>
+    <string name="settings_theme_follow_system">主题跟随系统</string>
+    <string name="settings_theme_follow_system_desc">切换后，应用界面会自动跟随系统深浅色模式。</string>
+    <string name="settings_theme_mode_label">手动主题</string>
+    <string name="settings_theme_light">浅色主题</string>
+    <string name="settings_theme_dark">深色主题</string>
+    <string name="settings_about_title">关于应用</string>
+    <string name="settings_about_desc">移动应用开发课程项目 · 天气演示应用</string>
+    <string name="settings_version_label">当前版本</string>
+    <string name="settings_current_city_label">当前城市</string>
+    <string name="settings_email_label">邮箱</string>
+    <string name="settings_phone_label">手机号</string>
+    <string name="settings_not_set">未设置</string>
+    <string name="settings_danger_title">账号操作</string>
+    <string name="settings_danger_desc">退出登录后将返回登录页，本地账号与城市数据不会删除。</string>
+    <string name="settings_logout_confirm_title">退出当前账号？</string>
+    <string name="settings_logout_confirm_message">退出后会回到登录页，你仍然可以使用相同账号重新登录。</string>
+
+    <string name="weather_sunny">晴</string>
+    <string name="weather_cloudy">多云</string>
+    <string name="weather_overcast">阴</string>
+    <string name="weather_rain">小雨</string>
+    <string name="weather_snow">小雪</string>
+    <string name="wind_east_south">东南风</string>
+    <string name="wind_east">东风</string>
+    <string name="wind_north_east">东北风</string>
+    <string name="wind_power_level">3级</string>
+    <string name="wind_power_night">2级</string>
 </resources>

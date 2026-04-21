@@ -4,6 +4,7 @@ import android.content.Context;
 
 import androidx.annotation.Nullable;
 
+import com.dengyy.weatherapp.R;
 import com.dengyy.weatherapp.db.dao.CurrentWeatherDao;
 import com.dengyy.weatherapp.db.dao.ForecastWeatherDao;
 import com.dengyy.weatherapp.model.CurrentWeather;
@@ -16,9 +17,10 @@ public class WeatherRepository {
 
     private final CurrentWeatherDao currentWeatherDao;
     private final ForecastWeatherDao forecastWeatherDao;
+    private final Context appContext;
 
     public WeatherRepository(Context context) {
-        Context appContext = context.getApplicationContext();
+        this.appContext = context.getApplicationContext();
         this.currentWeatherDao = new CurrentWeatherDao(appContext);
         this.forecastWeatherDao = new ForecastWeatherDao(appContext);
     }
@@ -44,35 +46,41 @@ public class WeatherRepository {
         CurrentWeather weather = new CurrentWeather();
         weather.setAdCode(adCode);
         weather.setCityName(cityName);
-        weather.setWeather("晴");
+        weather.setWeather(appContext.getString(R.string.weather_sunny));
         weather.setTemperature("26");
         weather.setHumidity("58");
-        weather.setWindDirection("东南风");
-        weather.setWindPower("3级");
+        weather.setWindDirection(appContext.getString(R.string.wind_east_south));
+        weather.setWindPower(appContext.getString(R.string.wind_power_level));
         weather.setHighTemp("28");
         weather.setLowTemp("20");
-        weather.setReportTime("骨架阶段");
+        weather.setReportTime("10:30");
         weather.setCacheTime(System.currentTimeMillis());
         return weather;
     }
 
     public List<ForecastWeather> createMockForecastWeather(String adCode, String cityName) {
         List<ForecastWeather> forecasts = new ArrayList<>();
-        String[] dates = {"周一", "周二", "周三", "周四"};
+        String[] dates = {"周二", "周三", "周四", "周五"};
+        String[] dayWeather = {
+                appContext.getString(R.string.weather_cloudy),
+                appContext.getString(R.string.weather_sunny),
+                appContext.getString(R.string.weather_overcast),
+                appContext.getString(R.string.weather_rain)
+        };
         for (int i = 0; i < dates.length; i++) {
             ForecastWeather forecast = new ForecastWeather();
             forecast.setAdCode(adCode);
             forecast.setCityName(cityName);
             forecast.setForecastDate(dates[i]);
             forecast.setWeek(String.valueOf(i + 1));
-            forecast.setDayWeather("多云");
-            forecast.setNightWeather("晴");
+            forecast.setDayWeather(dayWeather[i]);
+            forecast.setNightWeather(appContext.getString(R.string.weather_sunny));
             forecast.setDayTemp(String.valueOf(27 + i));
             forecast.setNightTemp(String.valueOf(19 + i));
-            forecast.setDayWind("东风");
-            forecast.setNightWind("东北风");
-            forecast.setDayPower("3级");
-            forecast.setNightPower("2级");
+            forecast.setDayWind(appContext.getString(R.string.wind_east));
+            forecast.setNightWind(appContext.getString(R.string.wind_north_east));
+            forecast.setDayPower(appContext.getString(R.string.wind_power_level));
+            forecast.setNightPower(appContext.getString(R.string.wind_power_night));
             forecast.setCacheTime(System.currentTimeMillis());
             forecasts.add(forecast);
         }

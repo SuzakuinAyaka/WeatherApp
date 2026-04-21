@@ -49,6 +49,8 @@ public final class Constants {
     public static final String SP_NAME = "weather_app_sp";
     public static final String SP_KEY_LOGIN_USER_ID = "login_user_id";
     public static final String SP_KEY_LOGIN_USERNAME = "login_username";
+    public static final String SP_KEY_THEME_FOLLOW_SYSTEM = "theme_follow_system";
+    public static final String SP_KEY_THEME_MODE = "theme_mode";
 
     private Constants() {
     }

@@ -29,15 +29,24 @@ public class ForecastAdapter extends RecyclerView.Adapter<ForecastAdapter.ViewHo
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_forecast, parent, false);
+        View view = LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.item_forecast_card, parent, false);
         return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         ForecastWeather item = items.get(position);
-        holder.titleView.setText(item.getForecastDate());
-        holder.subtitleView.setText(item.getDayWeather() + " " + item.getDayTemp() + "°");
+        holder.dayView.setText(item.getForecastDate());
+        holder.weatherView.setText(item.getDayWeather());
+        holder.tempView.setText(
+                holder.itemView.getContext().getString(
+                        R.string.main_high_low,
+                        item.getDayTemp(),
+                        item.getNightTemp()
+                )
+        );
+        holder.windView.setText(item.getDayWind() + " · " + item.getDayPower());
     }
 
     @Override
@@ -47,13 +56,17 @@ public class ForecastAdapter extends RecyclerView.Adapter<ForecastAdapter.ViewHo
 
     static class ViewHolder extends RecyclerView.ViewHolder {
 
-        private final TextView titleView;
-        private final TextView subtitleView;
+        private final TextView dayView;
+        private final TextView weatherView;
+        private final TextView tempView;
+        private final TextView windView;
 
         ViewHolder(@NonNull View itemView) {
             super(itemView);
-            titleView = itemView.findViewById(R.id.text_title);
-            subtitleView = itemView.findViewById(R.id.text_subtitle);
+            dayView = itemView.findViewById(R.id.text_forecast_day);
+            weatherView = itemView.findViewById(R.id.text_forecast_weather);
+            tempView = itemView.findViewById(R.id.text_forecast_temp);
+            windView = itemView.findViewById(R.id.text_forecast_wind);
         }
     }
 }

@@ -2,6 +2,7 @@ package com.dengyy.weatherapp.ui;
 
 import android.graphics.Rect;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.EditText;
 import android.widget.ScrollView;
@@ -11,6 +12,8 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
+
+import com.dengyy.weatherapp.R;
 
 public abstract class BaseActivity extends AppCompatActivity {
 
@@ -43,6 +46,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         final int baseTopPadding = rootView.getPaddingTop();
         final int baseRightPadding = rootView.getPaddingRight();
         final int baseBottomPadding = rootView.getPaddingBottom();
+        View statusBarSpacer = rootView.findViewById(R.id.status_bar_spacer);
 
         ViewCompat.setOnApplyWindowInsetsListener(rootView, (view, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -51,9 +55,17 @@ public abstract class BaseActivity extends AppCompatActivity {
             int bottomInset = imeVisible
                     ? Math.max(systemBars.bottom, imeInsets.bottom)
                     : systemBars.bottom;
+            if (statusBarSpacer != null) {
+                ViewGroup.LayoutParams spacerLayoutParams = statusBarSpacer.getLayoutParams();
+                int targetHeight = systemBars.top;
+                if (spacerLayoutParams != null && spacerLayoutParams.height != targetHeight) {
+                    spacerLayoutParams.height = targetHeight;
+                    statusBarSpacer.setLayoutParams(spacerLayoutParams);
+                }
+            }
             view.setPadding(
                     baseLeftPadding + systemBars.left,
-                    baseTopPadding + systemBars.top,
+                    baseTopPadding + (statusBarSpacer == null ? systemBars.top : 0),
                     baseRightPadding + systemBars.right,
                     baseBottomPadding + bottomInset
             );
