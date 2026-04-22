@@ -120,7 +120,7 @@
                     android:paddingStart="16dp"
                     android:paddingTop="8dp"
                     android:paddingEnd="16dp"
-                    android:paddingBottom="28dp">
+                                android:paddingBottom="112dp">
 
                     <LinearLayout
                         android:id="@+id/card_weather_hero"
