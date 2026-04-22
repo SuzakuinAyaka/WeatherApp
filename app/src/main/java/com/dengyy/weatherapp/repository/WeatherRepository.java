@@ -46,14 +46,14 @@ public class WeatherRepository {
         CurrentWeather weather = new CurrentWeather();
         weather.setAdCode(adCode);
         weather.setCityName(cityName);
-        weather.setWeather(appContext.getString(R.string.weather_sunny));
-        weather.setTemperature("26");
-        weather.setHumidity("58");
-        weather.setWindDirection(appContext.getString(R.string.wind_east_south));
+        weather.setWeather(resolveMockWeather(adCode));
+        weather.setTemperature(resolveMockTemperature(adCode));
+        weather.setHumidity(resolveMockHumidity(adCode));
+        weather.setWindDirection(resolveMockWindDirection(adCode));
         weather.setWindPower(appContext.getString(R.string.wind_power_level));
-        weather.setHighTemp("28");
-        weather.setLowTemp("20");
-        weather.setReportTime("10:30");
+        weather.setHighTemp(resolveMockHighTemp(adCode));
+        weather.setLowTemp(resolveMockLowTemp(adCode));
+        weather.setReportTime(resolveMockReportTime(adCode));
         weather.setCacheTime(System.currentTimeMillis());
         return weather;
     }
@@ -85,5 +85,90 @@ public class WeatherRepository {
             forecasts.add(forecast);
         }
         return forecasts;
+    }
+
+    private String resolveMockWeather(String adCode) {
+        if ("310100".equals(adCode)) {
+            return appContext.getString(R.string.weather_rain);
+        }
+        if ("510100".equals(adCode)) {
+            return appContext.getString(R.string.weather_cloudy);
+        }
+        if ("230100".equals(adCode)) {
+            return appContext.getString(R.string.weather_snow);
+        }
+        return appContext.getString(R.string.weather_sunny);
+    }
+
+    private String resolveMockTemperature(String adCode) {
+        if ("310100".equals(adCode)) {
+            return "22";
+        }
+        if ("510100".equals(adCode)) {
+            return "24";
+        }
+        if ("230100".equals(adCode)) {
+            return "-8";
+        }
+        return "26";
+    }
+
+    private String resolveMockHumidity(String adCode) {
+        if ("310100".equals(adCode)) {
+            return "88";
+        }
+        if ("510100".equals(adCode)) {
+            return "72";
+        }
+        if ("230100".equals(adCode)) {
+            return "64";
+        }
+        return "58";
+    }
+
+    private String resolveMockWindDirection(String adCode) {
+        if ("230100".equals(adCode)) {
+            return appContext.getString(R.string.wind_north_east);
+        }
+        return appContext.getString(R.string.wind_east_south);
+    }
+
+    private String resolveMockHighTemp(String adCode) {
+        if ("310100".equals(adCode)) {
+            return "24";
+        }
+        if ("510100".equals(adCode)) {
+            return "26";
+        }
+        if ("230100".equals(adCode)) {
+            return "-4";
+        }
+        return "28";
+    }
+
+    private String resolveMockLowTemp(String adCode) {
+        if ("310100".equals(adCode)) {
+            return "19";
+        }
+        if ("510100".equals(adCode)) {
+            return "18";
+        }
+        if ("230100".equals(adCode)) {
+            return "-14";
+        }
+        return "20";
+    }
+
+    private String resolveMockReportTime(String adCode) {
+        if ("310100".equals(adCode)) {
+            return "09:40";
+        }
+        if ("510100".equals(adCode)) {
+            return "11:05";
+        }
+        if ("230100".equals(adCode)) {
+            return "07:20";
+        }
+        return "10:30";
     }
 }

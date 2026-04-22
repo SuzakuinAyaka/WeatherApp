@@ -92,6 +92,18 @@ public class CityDao {
         ) > 0;
     }
 
+    public boolean updateCityDisplayInfo(long userId, String adCode, String cityName, String province) {
+        ContentValues values = new ContentValues();
+        values.put(Constants.COL_CITY_NAME, cityName);
+        values.put(Constants.COL_PROVINCE, province);
+        return dbHelper.getWritableDatabase().update(
+                Constants.TABLE_CITIES,
+                values,
+                Constants.COL_USER_ID + "=? AND " + Constants.COL_AD_CODE + "=?",
+                new String[]{String.valueOf(userId), adCode}
+        ) > 0;
+    }
+
     @Nullable
     public City getCurrentCity(long userId) {
         Cursor cursor = null;

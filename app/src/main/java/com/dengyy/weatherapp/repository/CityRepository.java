@@ -41,6 +41,21 @@ public class CityRepository {
         return rowId;
     }
 
+    public void ensurePresetCities(long userId) {
+        if (userId <= 0) {
+            return;
+        }
+        ensurePresetCity(userId, "\u5317\u4eac", "110100", "\u5317\u4eac");
+        ensurePresetCity(userId, "\u4e0a\u6d77", "310100", "\u4e0a\u6d77");
+        ensurePresetCity(userId, "\u6210\u90fd", "510100", "\u56db\u5ddd");
+        ensurePresetCity(userId, "\u54c8\u5c14\u6ee8", "230100", "\u9ed1\u9f99\u6c5f");
+    }
+
+    private void ensurePresetCity(long userId, String cityName, String adCode, String province) {
+        addCity(userId, cityName, adCode, province);
+        cityDao.updateCityDisplayInfo(userId, adCode, cityName, province);
+    }
+
     public List<City> getSavedCities(long userId) {
         if (userId <= 0) {
             return Collections.emptyList();

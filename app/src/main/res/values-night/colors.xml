@@ -41,6 +41,8 @@
     <color name="main_metric_icon_bg">#267AB5DC</color>
     <color name="main_accent">#9EC9E7</color>
     <color name="main_on_accent">#08273B</color>
+    <color name="main_text_glow_soft">#8C061019</color>
+    <color name="main_text_glow_strong">#B30A1621</color>
     <color name="settings_danger_bg">#3A231F</color>
     <color name="settings_danger_stroke">#7E5A53</color>
     <color name="settings_danger_text">#F1B4AA</color>

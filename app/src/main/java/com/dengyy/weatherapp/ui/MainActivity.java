@@ -1,7 +1,6 @@
 package com.dengyy.weatherapp.ui;
 
 import android.content.Intent;
-import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -47,8 +46,8 @@ public class MainActivity extends BaseActivity {
 
     private DrawerLayout drawerLayout;
     private SwipeRefreshLayout swipeRefreshLayout;
-    private View mainContentContainer;
     private View drawerContainer;
+    private WeatherBackgroundView weatherBackgroundView;
     private TextView welcomeView;
     private TextView toolbarCityView;
     private TextView toolbarSummaryView;
@@ -103,8 +102,8 @@ public class MainActivity extends BaseActivity {
     private void bindViews() {
         drawerLayout = findViewById(R.id.main_root);
         swipeRefreshLayout = findViewById(R.id.swipe_refresh);
-        mainContentContainer = findViewById(R.id.main_content_container);
         drawerContainer = findViewById(R.id.drawer_container);
+        weatherBackgroundView = findViewById(R.id.view_weather_background);
         welcomeView = findViewById(R.id.text_welcome);
         toolbarCityView = findViewById(R.id.text_toolbar_city);
         toolbarSummaryView = findViewById(R.id.text_toolbar_summary);
@@ -202,16 +201,12 @@ public class MainActivity extends BaseActivity {
     }
 
     private City ensureCurrentCity(long userId) {
+        cityRepository.ensurePresetCities(userId);
         City current = cityRepository.getCurrentCity(userId);
         if (current != null) {
             return current;
         }
-        cityRepository.addCity(
-                userId,
-                getString(R.string.main_default_city),
-                "110100",
-                getString(R.string.main_default_province)
-        );
+        cityRepository.switchCurrentCity(userId, "110100");
         return cityRepository.getCurrentCity(userId);
     }
 
@@ -304,16 +299,29 @@ public class MainActivity extends BaseActivity {
 
     private void applyWeatherTheme(String weather) {
         int[] colors = resolveGradientColors(weather);
-        GradientDrawable background = new GradientDrawable(
-                GradientDrawable.Orientation.TOP_BOTTOM,
-                colors
-        );
-        mainContentContainer.setBackground(background);
+        weatherBackgroundView.setWeatherType(resolveWeatherType(weather));
 
         int drawerColor = ColorUtils.blendARGB(colors[0], colors[1], 0.55f);
-        GradientDrawable drawerBackground = new GradientDrawable();
+        android.graphics.drawable.GradientDrawable drawerBackground = new android.graphics.drawable.GradientDrawable();
         drawerBackground.setColor(ColorUtils.setAlphaComponent(drawerColor, 242));
         drawerContainer.setBackground(drawerBackground);
+    }
+
+    private int resolveWeatherType(String weather) {
+        if (weather == null) {
+            return WeatherBackgroundView.WEATHER_SUNNY;
+        }
+        if (weather.contains(getString(R.string.weather_rain))) {
+            return WeatherBackgroundView.WEATHER_RAIN;
+        }
+        if (weather.contains(getString(R.string.weather_snow))) {
+            return WeatherBackgroundView.WEATHER_SNOW;
+        }
+        if (weather.contains(getString(R.string.weather_overcast))
+                || weather.contains(getString(R.string.weather_cloudy))) {
+            return WeatherBackgroundView.WEATHER_CLOUDY;
+        }
+        return WeatherBackgroundView.WEATHER_SUNNY;
     }
 
     private int[] resolveGradientColors(String weather) {
