@@ -10,6 +10,8 @@ import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 import androidx.activity.OnBackPressedCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.core.graphics.ColorUtils;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -69,6 +71,7 @@ public class MainActivity extends BaseActivity {
     private TextView emptyCitiesView;
     private ForecastAdapter forecastAdapter;
     private SavedCityAdapter savedCityAdapter;
+    private ActivityResultLauncher<Intent> addCityLauncher;
 
     @Nullable
     private City currentCity;
@@ -83,6 +86,7 @@ public class MainActivity extends BaseActivity {
         cityRepository = new CityRepository(this);
         weatherRepository = new WeatherRepository(this);
 
+        initLaunchers();
         bindViews();
         setupLists();
         setupActions();
@@ -124,6 +128,27 @@ public class MainActivity extends BaseActivity {
         emptyCitiesView = findViewById(R.id.text_empty_saved_cities);
     }
 
+    private void initLaunchers() {
+        addCityLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() != RESULT_OK) {
+                        return;
+                    }
+                    if (drawerLayout != null && drawerLayout.isDrawerOpen(GravityCompat.START)) {
+                        drawerLayout.closeDrawer(GravityCompat.START);
+                    }
+                    String cityName = null;
+                    if (result.getData() != null) {
+                        cityName = result.getData().getStringExtra(AddCityActivity.EXTRA_SELECTED_CITY_NAME);
+                    }
+                    loadPageData(false, cityName == null || cityName.trim().isEmpty()
+                            ? getString(R.string.message_main_refreshed)
+                            : getString(R.string.message_city_switched, cityName));
+                }
+        );
+    }
+
     private void setupLists() {
         RecyclerView forecastRecycler = findViewById(R.id.recycler_forecast);
         forecastRecycler.setLayoutManager(
@@ -158,9 +183,12 @@ public class MainActivity extends BaseActivity {
         settingsButton.setOnClickListener(v ->
                 startActivity(new Intent(this, SettingsActivity.class))
         );
-        addCityButton.setOnClickListener(v ->
-                startActivity(new Intent(this, AddCityActivity.class))
-        );
+        addCityButton.setOnClickListener(v -> {
+            if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+                drawerLayout.closeDrawer(GravityCompat.START);
+            }
+            addCityLauncher.launch(new Intent(this, AddCityActivity.class));
+        });
         detailsButton.setOnClickListener(v -> {
             Intent intent = new Intent(this, DetailsOfTodayActivity.class);
             if (currentCity != null) {

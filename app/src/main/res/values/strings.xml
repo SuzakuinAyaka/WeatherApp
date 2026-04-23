@@ -152,7 +152,7 @@
     <string name="wind_power_night">2级</string>
     <string name="action_delete">删除</string>
     <string name="action_search_city">搜索城市</string>
-    <string name="hint_city_keyword">输入城市名，例如北京、上海、成都</string>
+    <string name="hint_city_keyword">输入城市名</string>
     <string name="add_city_search_tips">通过高德城市查询搜索并添加城市，点击结果即可加入侧边栏列表。</string>
     <string name="empty_city_search_initial">输入城市名称后开始搜索</string>
     <string name="empty_city_search_result">没有找到匹配的城市，请换个关键词试试</string>

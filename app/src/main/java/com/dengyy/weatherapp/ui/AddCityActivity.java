@@ -1,5 +1,6 @@
 package com.dengyy.weatherapp.ui;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -29,6 +30,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class AddCityActivity extends BaseActivity {
+
+    public static final String EXTRA_SELECTED_CITY_NAME = "selected_city_name";
 
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
@@ -134,22 +137,44 @@ public class AddCityActivity extends BaseActivity {
             }
 
             CityRepository.AddCityResult result = cityRepository.addCityForUser(userId, city);
-            mainHandler.post(() -> handleAddCityResult(city, result));
+            boolean switched = false;
+            if (result == CityRepository.AddCityResult.SUCCESS
+                    || result == CityRepository.AddCityResult.ALREADY_EXISTS) {
+                switched = cityRepository.switchCurrentCity(userId, city.getAdCode());
+            }
+            boolean finalSwitched = switched;
+            mainHandler.post(() -> handleAddCityResult(city, result, finalSwitched));
         });
     }
 
-    private void handleAddCityResult(City city, CityRepository.AddCityResult result) {
+    private void handleAddCityResult(City city, CityRepository.AddCityResult result, boolean switched) {
         int messageResId;
         if (result == CityRepository.AddCityResult.SUCCESS) {
-            setResult(RESULT_OK);
+            Intent resultIntent = new Intent();
+            resultIntent.putExtra(EXTRA_SELECTED_CITY_NAME, city.getCityName());
+            setResult(RESULT_OK, resultIntent);
             Snackbar.make(
                     findViewById(R.id.add_city_root),
-                    getString(R.string.message_city_added, city.getCityName()),
+                    switched
+                            ? getString(R.string.message_city_switched, city.getCityName())
+                            : getString(R.string.message_city_added, city.getCityName()),
                     Snackbar.LENGTH_SHORT
             ).show();
             mainHandler.postDelayed(this::finish, 180L);
             return;
         } else if (result == CityRepository.AddCityResult.ALREADY_EXISTS) {
+            if (switched) {
+                Intent resultIntent = new Intent();
+                resultIntent.putExtra(EXTRA_SELECTED_CITY_NAME, city.getCityName());
+                setResult(RESULT_OK, resultIntent);
+                Snackbar.make(
+                        findViewById(R.id.add_city_root),
+                        getString(R.string.message_city_switched, city.getCityName()),
+                        Snackbar.LENGTH_SHORT
+                ).show();
+                mainHandler.postDelayed(this::finish, 180L);
+                return;
+            }
             messageResId = R.string.message_city_exists;
         } else {
             messageResId = R.string.message_city_add_failed;
