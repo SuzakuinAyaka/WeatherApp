@@ -394,62 +394,13 @@ public class MainActivity extends BaseActivity {
     }
 
     private void applyWeatherTheme(String weather) {
-        int[] colors = resolveGradientColors(weather);
-        weatherBackgroundView.setWeatherType(resolveWeatherType(weather));
+        int[] colors = WeatherThemeResolver.resolveGradientColors(this, weather);
+        weatherBackgroundView.setWeatherType(WeatherThemeResolver.resolveWeatherType(weather));
 
         int drawerColor = ColorUtils.blendARGB(colors[0], colors[1], 0.55f);
         android.graphics.drawable.GradientDrawable drawerBackground = new android.graphics.drawable.GradientDrawable();
         drawerBackground.setColor(ColorUtils.setAlphaComponent(drawerColor, 242));
         drawerContainer.setBackground(drawerBackground);
-    }
-
-    private int resolveWeatherType(String weather) {
-        if (weather == null) {
-            return WeatherBackgroundView.WEATHER_SUNNY;
-        }
-        if (weather.contains(getString(R.string.weather_rain))) {
-            return WeatherBackgroundView.WEATHER_RAIN;
-        }
-        if (weather.contains(getString(R.string.weather_snow))) {
-            return WeatherBackgroundView.WEATHER_SNOW;
-        }
-        if (weather.contains(getString(R.string.weather_overcast))
-                || weather.contains(getString(R.string.weather_cloudy))) {
-            return WeatherBackgroundView.WEATHER_CLOUDY;
-        }
-        return WeatherBackgroundView.WEATHER_SUNNY;
-    }
-
-    private int[] resolveGradientColors(String weather) {
-        if (weather == null) {
-            return new int[]{
-                    getColor(R.color.main_bg_sunny_top),
-                    getColor(R.color.main_bg_sunny_bottom)
-            };
-        }
-        if (weather.contains(getString(R.string.weather_rain))) {
-            return new int[]{
-                    getColor(R.color.main_bg_rain_top),
-                    getColor(R.color.main_bg_rain_bottom)
-            };
-        }
-        if (weather.contains(getString(R.string.weather_snow))) {
-            return new int[]{
-                    getColor(R.color.main_bg_snow_top),
-                    getColor(R.color.main_bg_snow_bottom)
-            };
-        }
-        if (weather.contains(getString(R.string.weather_overcast))
-                || weather.contains(getString(R.string.weather_cloudy))) {
-            return new int[]{
-                    getColor(R.color.main_bg_cloudy_top),
-                    getColor(R.color.main_bg_cloudy_bottom)
-            };
-        }
-        return new int[]{
-                getColor(R.color.main_bg_sunny_top),
-                getColor(R.color.main_bg_sunny_bottom)
-        };
     }
 
     private static final class MainUiState {

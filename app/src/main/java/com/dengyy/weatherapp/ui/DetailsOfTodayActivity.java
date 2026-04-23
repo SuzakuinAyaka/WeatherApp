@@ -175,7 +175,7 @@ public class DetailsOfTodayActivity extends BaseActivity {
     }
 
     private void applyWeatherTheme(@Nullable String weather) {
-        int[] colors = resolveGradientColors(weather);
+        int[] colors = WeatherThemeResolver.resolveGradientColors(this, weather);
         GradientDrawable gradientDrawable = new GradientDrawable(
                 GradientDrawable.Orientation.TOP_BOTTOM,
                 new int[]{
@@ -184,37 +184,5 @@ public class DetailsOfTodayActivity extends BaseActivity {
                 }
         );
         rootView.setBackground(gradientDrawable);
-    }
-
-    private int[] resolveGradientColors(@Nullable String weather) {
-        if (weather == null) {
-            return new int[]{
-                    getColor(R.color.main_bg_sunny_top),
-                    getColor(R.color.main_bg_sunny_bottom)
-            };
-        }
-        if (weather.contains(getString(R.string.weather_rain))) {
-            return new int[]{
-                    getColor(R.color.main_bg_rain_top),
-                    getColor(R.color.main_bg_rain_bottom)
-            };
-        }
-        if (weather.contains(getString(R.string.weather_snow))) {
-            return new int[]{
-                    getColor(R.color.main_bg_snow_top),
-                    getColor(R.color.main_bg_snow_bottom)
-            };
-        }
-        if (weather.contains(getString(R.string.weather_overcast))
-                || weather.contains(getString(R.string.weather_cloudy))) {
-            return new int[]{
-                    getColor(R.color.main_bg_cloudy_top),
-                    getColor(R.color.main_bg_cloudy_bottom)
-            };
-        }
-        return new int[]{
-                getColor(R.color.main_bg_sunny_top),
-                getColor(R.color.main_bg_sunny_bottom)
-        };
     }
 }
