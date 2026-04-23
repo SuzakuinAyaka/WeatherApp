@@ -132,21 +132,8 @@
                         android:paddingBottom="6dp">
 
                         <TextView
-                            android:id="@+id/text_welcome"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:shadowColor="@color/main_text_glow_soft"
-                            android:shadowDx="0"
-                            android:shadowDy="0"
-                            android:shadowRadius="12"
-                            android:textAppearance="@style/TextAppearance.Material3.TitleSmall"
-                            android:textColor="@color/main_on_surface_soft"
-                            tools:text="Welcome back, Ayaka" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="16dp"
                             android:shadowColor="@color/main_text_glow_soft"
                             android:shadowDx="0"
                             android:shadowDy="0"
@@ -457,9 +444,18 @@
                     android:padding="20dp">
 
                     <TextView
+                        android:id="@+id/text_drawer_status"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="@style/TextAppearance.Material3.TitleLarge"
+                        android:textColor="@color/main_on_surface_strong"
+                        tools:text="欢迎回来" />
+
+                    <TextView
                         android:id="@+id/text_drawer_username"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
                         android:textAppearance="@style/TextAppearance.Material3.HeadlineSmall"
                         android:textColor="@color/main_on_surface_strong"
                         tools:text="Ayaka" />
@@ -468,19 +464,10 @@
                         android:id="@+id/text_drawer_city"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
+                        android:layout_marginTop="12dp"
                         android:textAppearance="@style/TextAppearance.Material3.BodyLarge"
                         android:textColor="@color/main_on_surface_soft"
-                        tools:text="Current city / Beijing" />
-
-                    <TextView
-                        android:id="@+id/text_drawer_status"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
-                        android:text="@string/main_sidebar_status"
-                        android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
-                        android:textColor="@color/main_on_surface_soft" />
+                        tools:text="当前城市 / 西安" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 

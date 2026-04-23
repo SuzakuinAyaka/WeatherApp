@@ -89,6 +89,7 @@
     <string name="main_sidebar_title">已添加城市</string>
     <string name="main_sidebar_subtitle">切换城市后，主页天气会同步刷新。</string>
     <string name="main_sidebar_status">保持天气更新，出门更从容。</string>
+    <string name="main_welcome_back_plain">欢迎回来</string>
     <string name="main_welcome_back">欢迎回来，%1$s</string>
     <string name="main_user_fallback">游客</string>
     <string name="main_default_city">北京</string>

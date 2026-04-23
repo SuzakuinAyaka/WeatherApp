@@ -49,7 +49,6 @@ public class MainActivity extends BaseActivity {
     private SwipeRefreshLayout swipeRefreshLayout;
     private View drawerContainer;
     private WeatherBackgroundView weatherBackgroundView;
-    private TextView welcomeView;
     private TextView toolbarCityView;
     private TextView toolbarSummaryView;
     private TextView cityView;
@@ -105,7 +104,6 @@ public class MainActivity extends BaseActivity {
         swipeRefreshLayout = findViewById(R.id.swipe_refresh);
         drawerContainer = findViewById(R.id.drawer_container);
         weatherBackgroundView = findViewById(R.id.view_weather_background);
-        welcomeView = findViewById(R.id.text_welcome);
         toolbarCityView = findViewById(R.id.text_toolbar_city);
         toolbarSummaryView = findViewById(R.id.text_toolbar_summary);
         cityView = findViewById(R.id.text_current_city);
@@ -226,7 +224,6 @@ public class MainActivity extends BaseActivity {
         String weatherText = state.currentWeather.getWeather();
         String temperature = getString(R.string.main_temperature_unit, state.currentWeather.getTemperature());
 
-        welcomeView.setText(getString(R.string.main_welcome_back, username));
         toolbarCityView.setText(cityName);
         toolbarSummaryView.setText(weatherText + " / " + temperature);
         cityView.setText(cityName);
@@ -247,7 +244,7 @@ public class MainActivity extends BaseActivity {
 
         drawerUsernameView.setText(username);
         drawerCityView.setText(getString(R.string.settings_current_city_label) + " / " + cityName);
-        drawerStatusView.setText(getString(R.string.main_sidebar_status));
+        drawerStatusView.setText(getString(R.string.main_welcome_back_plain));
         savedCityCountView.setText(getString(
                 R.string.main_drawer_city_count,
                 state.savedCities.size()
