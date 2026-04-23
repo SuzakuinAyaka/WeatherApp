@@ -27,6 +27,7 @@ import com.dengyy.weatherapp.model.User;
 import com.dengyy.weatherapp.repository.CityRepository;
 import com.dengyy.weatherapp.repository.UserRepository;
 import com.dengyy.weatherapp.repository.WeatherRepository;
+import com.dengyy.weatherapp.utils.DateUtils;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
@@ -271,6 +272,9 @@ public class MainActivity extends BaseActivity {
         String cityName = state.currentCity.getCityName();
         String weatherText = state.currentWeather.getWeather();
         String temperature = getString(R.string.main_temperature_unit, state.currentWeather.getTemperature());
+        String refreshedAt = state.currentWeather.getCacheTime() > 0
+                ? DateUtils.format(state.currentWeather.getCacheTime())
+                : "--";
 
         toolbarCityView.setText(cityName);
         toolbarSummaryView.setText(weatherText + " / " + temperature);
@@ -284,7 +288,7 @@ public class MainActivity extends BaseActivity {
         ));
         reportTimeView.setText(getString(
                 R.string.main_weather_updated_at,
-                state.currentWeather.getReportTime()
+                refreshedAt
         ));
         humidityView.setText(getString(R.string.main_humidity_value, state.currentWeather.getHumidity()));
         windDirectionView.setText(state.currentWeather.getWindDirection());

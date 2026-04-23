@@ -21,6 +21,7 @@ import com.dengyy.weatherapp.model.User;
 import com.dengyy.weatherapp.repository.CityRepository;
 import com.dengyy.weatherapp.repository.UserRepository;
 import com.dengyy.weatherapp.repository.WeatherRepository;
+import com.dengyy.weatherapp.utils.DateUtils;
 
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -144,6 +145,9 @@ public class DetailsOfTodayActivity extends BaseActivity {
         provinceView.setText(city.getProvince());
         weatherView.setText(currentWeather.getWeather());
         temperatureView.setText(getString(R.string.main_temperature_unit, currentWeather.getTemperature()));
+        String refreshedAt = currentWeather.getCacheTime() > 0
+                ? DateUtils.format(currentWeather.getCacheTime())
+                : "--";
         highLowView.setText(getString(
                 R.string.main_high_low,
                 currentWeather.getHighTemp(),
@@ -151,7 +155,7 @@ public class DetailsOfTodayActivity extends BaseActivity {
         ));
         updatedAtView.setText(getString(
                 R.string.main_weather_updated_at,
-                currentWeather.getReportTime()
+                refreshedAt
         ));
 
         conditionValueView.setText(currentWeather.getWeather());
