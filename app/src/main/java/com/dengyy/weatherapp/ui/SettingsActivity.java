@@ -31,6 +31,7 @@ public class SettingsActivity extends BaseActivity {
     private CityRepository cityRepository;
     private LinearLayout themeModeLayout;
     private Spinner themeModeInput;
+    private MaterialSwitch debugSampleSwitch;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,8 +54,10 @@ public class SettingsActivity extends BaseActivity {
         themeModeLayout = findViewById(R.id.layout_theme_mode);
         themeModeInput = findViewById(R.id.input_theme_mode);
         MaterialSwitch themeSwitch = findViewById(R.id.switch_theme_follow_system);
+        debugSampleSwitch = findViewById(R.id.switch_debug_sample_cities);
         boolean followSystem = SPUtils.isThemeFollowSystem(this);
         int savedThemeMode = SPUtils.getThemeMode(this);
+        boolean debugSampleEnabled = SPUtils.isDebugSampleCitiesEnabled(this);
 
         String[] themeOptions = {
                 getString(R.string.settings_theme_light),
@@ -92,6 +95,16 @@ public class SettingsActivity extends BaseActivity {
             int selectedThemeMode = clampThemeMode(SPUtils.getThemeMode(this));
             themeModeInput.setSelection(selectedThemeMode, false);
             applyThemeMode(isChecked, selectedThemeMode);
+        });
+
+        debugSampleSwitch.setChecked(debugSampleEnabled);
+        debugSampleSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            SPUtils.setDebugSampleCitiesEnabled(this, isChecked);
+            long userId = userRepository.getLoginUserId();
+            if (userId > 0) {
+                cityRepository.syncDebugSampleCities(userId, isChecked);
+                bindUserContent();
+            }
         });
     }
 

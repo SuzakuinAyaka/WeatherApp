@@ -56,6 +56,10 @@ public class WeatherRepository {
     }
 
     public WeatherSnapshot getWeatherSnapshot(City city, boolean forceRefresh) {
+        if (CityRepository.isDebugSampleCityAdCode(city.getAdCode())) {
+            return buildDebugSampleSnapshot(city);
+        }
+
         CurrentWeather cachedCurrent = getCachedCurrentWeather(city.getAdCode());
         List<ForecastWeather> cachedForecasts = getCachedForecastWeather(city.getAdCode());
 
@@ -178,6 +182,80 @@ public class WeatherRepository {
                 && TextUtils.equals(highTemp, currentWeather.getHighTemp())
                 && TextUtils.equals(lowTemp, currentWeather.getLowTemp())
                 && TextUtils.equals(reportTime, currentWeather.getReportTime());
+    }
+
+    private WeatherSnapshot buildDebugSampleSnapshot(City city) {
+        CurrentWeather currentWeather = new CurrentWeather();
+        currentWeather.setAdCode(city.getAdCode());
+        currentWeather.setCityName(city.getCityName());
+        currentWeather.setCacheTime(System.currentTimeMillis());
+        currentWeather.setReportTime("debug");
+
+        List<ForecastWeather> forecasts = new ArrayList<>();
+        if (CityRepository.SAMPLE_SUNNY_AD_CODE.equals(city.getAdCode())) {
+            currentWeather.setWeather(appContext.getString(com.dengyy.weatherapp.R.string.weather_sunny));
+            currentWeather.setTemperature("28");
+            currentWeather.setHumidity("42");
+            currentWeather.setWindDirection(appContext.getString(com.dengyy.weatherapp.R.string.wind_east));
+            currentWeather.setWindPower(appContext.getString(com.dengyy.weatherapp.R.string.wind_power_level));
+            currentWeather.setHighTemp("31");
+            currentWeather.setLowTemp("20");
+            forecasts.add(buildDebugForecast(city, "D+1", appContext.getString(com.dengyy.weatherapp.R.string.weather_sunny), "32", "21"));
+            forecasts.add(buildDebugForecast(city, "D+2", appContext.getString(com.dengyy.weatherapp.R.string.weather_cloudy), "29", "22"));
+            forecasts.add(buildDebugForecast(city, "D+3", appContext.getString(com.dengyy.weatherapp.R.string.weather_sunny), "30", "20"));
+        } else if (CityRepository.SAMPLE_RAIN_AD_CODE.equals(city.getAdCode())) {
+            currentWeather.setWeather(appContext.getString(com.dengyy.weatherapp.R.string.weather_rain));
+            currentWeather.setTemperature("19");
+            currentWeather.setHumidity("88");
+            currentWeather.setWindDirection(appContext.getString(com.dengyy.weatherapp.R.string.wind_east_south));
+            currentWeather.setWindPower(appContext.getString(com.dengyy.weatherapp.R.string.wind_power_level));
+            currentWeather.setHighTemp("21");
+            currentWeather.setLowTemp("16");
+            forecasts.add(buildDebugForecast(city, "D+1", appContext.getString(com.dengyy.weatherapp.R.string.weather_rain), "20", "15"));
+            forecasts.add(buildDebugForecast(city, "D+2", appContext.getString(com.dengyy.weatherapp.R.string.weather_overcast), "22", "16"));
+            forecasts.add(buildDebugForecast(city, "D+3", appContext.getString(com.dengyy.weatherapp.R.string.weather_rain), "19", "14"));
+        } else if (CityRepository.SAMPLE_CLOUDY_AD_CODE.equals(city.getAdCode())) {
+            currentWeather.setWeather(appContext.getString(com.dengyy.weatherapp.R.string.weather_cloudy));
+            currentWeather.setTemperature("24");
+            currentWeather.setHumidity("63");
+            currentWeather.setWindDirection(appContext.getString(com.dengyy.weatherapp.R.string.wind_north_east));
+            currentWeather.setWindPower(appContext.getString(com.dengyy.weatherapp.R.string.wind_power_night));
+            currentWeather.setHighTemp("26");
+            currentWeather.setLowTemp("18");
+            forecasts.add(buildDebugForecast(city, "D+1", appContext.getString(com.dengyy.weatherapp.R.string.weather_cloudy), "25", "18"));
+            forecasts.add(buildDebugForecast(city, "D+2", appContext.getString(com.dengyy.weatherapp.R.string.weather_overcast), "24", "17"));
+            forecasts.add(buildDebugForecast(city, "D+3", appContext.getString(com.dengyy.weatherapp.R.string.weather_sunny), "27", "19"));
+        } else {
+            currentWeather.setWeather(appContext.getString(com.dengyy.weatherapp.R.string.weather_snow));
+            currentWeather.setTemperature("-3");
+            currentWeather.setHumidity("71");
+            currentWeather.setWindDirection(appContext.getString(com.dengyy.weatherapp.R.string.wind_north_east));
+            currentWeather.setWindPower(appContext.getString(com.dengyy.weatherapp.R.string.wind_power_night));
+            currentWeather.setHighTemp("0");
+            currentWeather.setLowTemp("-8");
+            forecasts.add(buildDebugForecast(city, "D+1", appContext.getString(com.dengyy.weatherapp.R.string.weather_snow), "-1", "-7"));
+            forecasts.add(buildDebugForecast(city, "D+2", appContext.getString(com.dengyy.weatherapp.R.string.weather_overcast), "1", "-5"));
+            forecasts.add(buildDebugForecast(city, "D+3", appContext.getString(com.dengyy.weatherapp.R.string.weather_snow), "-2", "-9"));
+        }
+        return new WeatherSnapshot(currentWeather, forecasts, false, null);
+    }
+
+    private ForecastWeather buildDebugForecast(City city, String date, String weather, String dayTemp, String nightTemp) {
+        ForecastWeather forecast = new ForecastWeather();
+        forecast.setAdCode(city.getAdCode());
+        forecast.setCityName(city.getCityName());
+        forecast.setForecastDate(date);
+        forecast.setWeek("--");
+        forecast.setDayWeather(weather);
+        forecast.setNightWeather(weather);
+        forecast.setDayTemp(dayTemp);
+        forecast.setNightTemp(nightTemp);
+        forecast.setDayWind(appContext.getString(com.dengyy.weatherapp.R.string.wind_east));
+        forecast.setNightWind(appContext.getString(com.dengyy.weatherapp.R.string.wind_north_east));
+        forecast.setDayPower(appContext.getString(com.dengyy.weatherapp.R.string.wind_power_level));
+        forecast.setNightPower(appContext.getString(com.dengyy.weatherapp.R.string.wind_power_night));
+        forecast.setCacheTime(System.currentTimeMillis());
+        return forecast;
     }
 
     public static final class WeatherSnapshot {

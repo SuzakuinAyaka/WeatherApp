@@ -10,11 +10,22 @@ import com.dengyy.weatherapp.db.dao.UserDao;
 import com.dengyy.weatherapp.model.City;
 import com.dengyy.weatherapp.network.CitySearchApiService;
 import com.dengyy.weatherapp.network.parser.CitySearchParser;
+import com.dengyy.weatherapp.utils.SPUtils;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 public class CityRepository {
+
+    public static final String DEFAULT_CITY_NAME = "\u897f\u5b89";
+    public static final String DEFAULT_CITY_AD_CODE = "610100";
+    public static final String DEFAULT_CITY_PROVINCE = "\u9655\u897f";
+
+    public static final String SAMPLE_SUNNY_AD_CODE = "debug_sunny";
+    public static final String SAMPLE_RAIN_AD_CODE = "debug_rain";
+    public static final String SAMPLE_CLOUDY_AD_CODE = "debug_cloudy";
+    public static final String SAMPLE_SNOW_AD_CODE = "debug_snow";
 
     public enum AddCityResult {
         SUCCESS,
@@ -28,13 +39,14 @@ public class CityRepository {
         NOT_FOUND
     }
 
+    private final Context appContext;
     private final CityDao cityDao;
     private final UserDao userDao;
     private final CitySearchApiService citySearchApiService;
     private final CitySearchParser citySearchParser;
 
     public CityRepository(Context context) {
-        Context appContext = context.getApplicationContext();
+        this.appContext = context.getApplicationContext();
         this.cityDao = new CityDao(appContext);
         this.userDao = new UserDao(appContext);
         this.citySearchApiService = new CitySearchApiService();
@@ -70,19 +82,50 @@ public class CityRepository {
         return rowId == -1 ? AddCityResult.ALREADY_EXISTS : AddCityResult.INVALID_INPUT;
     }
 
-    public void ensurePresetCities(long userId) {
+    public void ensureConfiguredCities(long userId) {
         if (userId <= 0) {
             return;
         }
-        ensurePresetCity(userId, "\u5317\u4eac", "110100", "\u5317\u4eac");
-        ensurePresetCity(userId, "\u4e0a\u6d77", "310100", "\u4e0a\u6d77");
-        ensurePresetCity(userId, "\u6210\u90fd", "510100", "\u56db\u5ddd");
-        ensurePresetCity(userId, "\u54c8\u5c14\u6ee8", "230100", "\u9ed1\u9f99\u6c5f");
+        if (getSavedCities(userId).isEmpty()) {
+            ensureDefaultCity(userId);
+        }
+        syncDebugSampleCities(userId, SPUtils.isDebugSampleCitiesEnabled(appContext));
     }
 
-    private void ensurePresetCity(long userId, String cityName, String adCode, String province) {
+    private void ensureDefaultCity(long userId) {
+        ensureStoredCity(userId, DEFAULT_CITY_NAME, DEFAULT_CITY_AD_CODE, DEFAULT_CITY_PROVINCE);
+    }
+
+    private void ensureStoredCity(long userId, String cityName, String adCode, String province) {
         addCity(userId, cityName, adCode, province);
         cityDao.updateCityDisplayInfo(userId, adCode, cityName, province);
+    }
+
+    public void syncDebugSampleCities(long userId, boolean enabled) {
+        if (userId <= 0) {
+            return;
+        }
+        if (enabled) {
+            ensureStoredCity(userId, "\u6674\u5929\u793a\u4f8b", SAMPLE_SUNNY_AD_CODE, "\u8c03\u8bd5");
+            ensureStoredCity(userId, "\u96e8\u5929\u793a\u4f8b", SAMPLE_RAIN_AD_CODE, "\u8c03\u8bd5");
+            ensureStoredCity(userId, "\u591a\u4e91\u793a\u4f8b", SAMPLE_CLOUDY_AD_CODE, "\u8c03\u8bd5");
+            ensureStoredCity(userId, "\u96ea\u5929\u793a\u4f8b", SAMPLE_SNOW_AD_CODE, "\u8c03\u8bd5");
+            return;
+        }
+
+        City currentCity = getCurrentCity(userId);
+        for (String adCode : getDebugSampleAdCodes()) {
+            cityDao.deleteCity(userId, adCode);
+        }
+        if (currentCity != null && isDebugSampleCityAdCode(currentCity.getAdCode())) {
+            List<City> remainingCities = getSavedCities(userId);
+            if (!remainingCities.isEmpty()) {
+                switchCurrentCity(userId, remainingCities.get(0).getAdCode());
+            } else {
+                ensureDefaultCity(userId);
+                switchCurrentCity(userId, DEFAULT_CITY_AD_CODE);
+            }
+        }
     }
 
     public List<City> getSavedCities(long userId) {
@@ -136,5 +179,21 @@ public class CityRepository {
     @Nullable
     public City getCurrentCity(long userId) {
         return cityDao.getCurrentCity(userId);
+    }
+
+    public static boolean isDebugSampleCityAdCode(@Nullable String adCode) {
+        return SAMPLE_SUNNY_AD_CODE.equals(adCode)
+                || SAMPLE_RAIN_AD_CODE.equals(adCode)
+                || SAMPLE_CLOUDY_AD_CODE.equals(adCode)
+                || SAMPLE_SNOW_AD_CODE.equals(adCode);
+    }
+
+    public static List<String> getDebugSampleAdCodes() {
+        List<String> adCodes = new ArrayList<>();
+        adCodes.add(SAMPLE_SUNNY_AD_CODE);
+        adCodes.add(SAMPLE_RAIN_AD_CODE);
+        adCodes.add(SAMPLE_CLOUDY_AD_CODE);
+        adCodes.add(SAMPLE_SNOW_AD_CODE);
+        return adCodes;
     }
 }

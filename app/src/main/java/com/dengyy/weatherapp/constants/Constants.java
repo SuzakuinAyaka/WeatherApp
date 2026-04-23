@@ -51,6 +51,7 @@ public final class Constants {
     public static final String SP_KEY_LOGIN_USERNAME = "login_username";
     public static final String SP_KEY_THEME_FOLLOW_SYSTEM = "theme_follow_system";
     public static final String SP_KEY_THEME_MODE = "theme_mode";
+    public static final String SP_KEY_DEBUG_SAMPLE_CITIES = "debug_sample_cities";
 
     private Constants() {
     }

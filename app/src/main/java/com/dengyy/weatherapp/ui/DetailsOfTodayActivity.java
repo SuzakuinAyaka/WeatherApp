@@ -109,7 +109,7 @@ public class DetailsOfTodayActivity extends BaseActivity {
             }
 
             long userId = user.getId();
-            cityRepository.ensurePresetCities(userId);
+            cityRepository.ensureConfiguredCities(userId);
             City city = resolveTargetCity(userId, getIntent().getStringExtra("adcode"));
             if (city == null) {
                 runOnUiThread(this::finish);

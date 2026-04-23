@@ -208,12 +208,12 @@ public class MainActivity extends BaseActivity {
     }
 
     private City ensureCurrentCity(long userId) {
-        cityRepository.ensurePresetCities(userId);
+        cityRepository.ensureConfiguredCities(userId);
         City current = cityRepository.getCurrentCity(userId);
         if (current != null) {
             return current;
         }
-        cityRepository.switchCurrentCity(userId, "110100");
+        cityRepository.switchCurrentCity(userId, CityRepository.DEFAULT_CITY_AD_CODE);
         return cityRepository.getCurrentCity(userId);
     }
 

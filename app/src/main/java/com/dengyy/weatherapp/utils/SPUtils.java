@@ -26,9 +26,11 @@ public final class SPUtils {
         SharedPreferences preferences = getPreferences(context);
         boolean followSystem = isThemeFollowSystem(context);
         int themeMode = getThemeMode(context);
+        boolean debugSampleCitiesEnabled = isDebugSampleCitiesEnabled(context);
         preferences.edit().clear().apply();
         setThemeFollowSystem(context, followSystem);
         setThemeMode(context, themeMode);
+        setDebugSampleCitiesEnabled(context, debugSampleCitiesEnabled);
     }
 
     public static void setThemeFollowSystem(Context context, boolean followSystem) {
@@ -49,6 +51,16 @@ public final class SPUtils {
 
     public static int getThemeMode(Context context) {
         return getPreferences(context).getInt(Constants.SP_KEY_THEME_MODE, 0);
+    }
+
+    public static void setDebugSampleCitiesEnabled(Context context, boolean enabled) {
+        getPreferences(context).edit()
+                .putBoolean(Constants.SP_KEY_DEBUG_SAMPLE_CITIES, enabled)
+                .apply();
+    }
+
+    public static boolean isDebugSampleCitiesEnabled(Context context) {
+        return getPreferences(context).getBoolean(Constants.SP_KEY_DEBUG_SAMPLE_CITIES, false);
     }
 
     private static SharedPreferences getPreferences(Context context) {

@@ -164,4 +164,6 @@
     <string name="main_metric_humidity_label">湿度</string>
     <string name="main_metric_wind_direction_label">风向</string>
     <string name="main_metric_wind_power_label">风力</string>
+    <string name="settings_debug_sample_cities">显示示例城市</string>
+    <string name="settings_debug_sample_cities_desc">开启后会显示晴天、雨天、多云、雪天四个调试示例城市，用于预览不同天气主题。</string>
 </resources>
