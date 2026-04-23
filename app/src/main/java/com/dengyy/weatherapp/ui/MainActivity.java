@@ -1,10 +1,13 @@
 package com.dengyy.weatherapp.ui;
 
 import android.content.Intent;
+import android.graphics.Rect;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewConfiguration;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
@@ -67,9 +70,16 @@ public class MainActivity extends BaseActivity {
     private TextView drawerStatusView;
     private TextView savedCityCountView;
     private TextView emptyCitiesView;
+    private RecyclerView forecastRecyclerView;
     private ForecastAdapter forecastAdapter;
     private SavedCityAdapter savedCityAdapter;
     private ActivityResultLauncher<Intent> addCityLauncher;
+    private int drawerSwipeMinDistance;
+    private int drawerSwipeEdgeWidthPx;
+    private float drawerSwipeDownX;
+    private float drawerSwipeDownY;
+    private boolean drawerSwipeTriggered;
+    private boolean drawerSwipeTrackingEnabled;
 
     @Nullable
     private City currentCity;
@@ -86,6 +96,7 @@ public class MainActivity extends BaseActivity {
 
         initLaunchers();
         bindViews();
+        setupDrawerSwipeGesture();
         setupLists();
         setupActions();
         setupBackBehavior();
@@ -124,6 +135,43 @@ public class MainActivity extends BaseActivity {
         emptyCitiesView = findViewById(R.id.text_empty_saved_cities);
     }
 
+    private void setupDrawerSwipeGesture() {
+        ViewConfiguration config = ViewConfiguration.get(this);
+        drawerSwipeMinDistance = config.getScaledTouchSlop() * 6;
+        drawerSwipeEdgeWidthPx = dpToPx(96);
+    }
+
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        if (drawerLayout != null && !drawerLayout.isDrawerOpen(GravityCompat.START) && ev != null) {
+            int action = ev.getActionMasked();
+            if (action == MotionEvent.ACTION_DOWN) {
+                drawerSwipeDownX = ev.getX();
+                drawerSwipeDownY = ev.getY();
+                drawerSwipeTriggered = false;
+                boolean isLeftEdgeDown = drawerSwipeDownX <= drawerSwipeEdgeWidthPx;
+                boolean inForecastList = isTouchInsideView(forecastRecyclerView, ev.getRawX(), ev.getRawY());
+                drawerSwipeTrackingEnabled = isLeftEdgeDown && !inForecastList;
+            } else if (action == MotionEvent.ACTION_MOVE && !drawerSwipeTriggered) {
+                if (!drawerSwipeTrackingEnabled) {
+                    return super.dispatchTouchEvent(ev);
+                }
+                float deltaX = ev.getX() - drawerSwipeDownX;
+                float deltaY = ev.getY() - drawerSwipeDownY;
+                boolean isRightSwipe = deltaX > drawerSwipeMinDistance
+                        && Math.abs(deltaX) > Math.abs(deltaY) * 1.3f;
+                if (isRightSwipe) {
+                    drawerSwipeTriggered = true;
+                    drawerLayout.openDrawer(GravityCompat.START);
+                }
+            } else if (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_CANCEL) {
+                drawerSwipeTriggered = false;
+                drawerSwipeTrackingEnabled = false;
+            }
+        }
+        return super.dispatchTouchEvent(ev);
+    }
+
     private void initLaunchers() {
         addCityLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
@@ -141,22 +189,39 @@ public class MainActivity extends BaseActivity {
                     loadPageData(false, cityName == null || cityName.trim().isEmpty()
                             ? getString(R.string.message_main_refreshed)
                             : getString(R.string.message_city_switched, cityName));
-                }
-        );
+                });
     }
 
     private void setupLists() {
-        RecyclerView forecastRecycler = findViewById(R.id.recycler_forecast);
-        forecastRecycler.setLayoutManager(
-                new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
-        );
+        forecastRecyclerView = findViewById(R.id.recycler_forecast);
+        forecastRecyclerView.setLayoutManager(
+                new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         forecastAdapter = new ForecastAdapter();
-        forecastRecycler.setAdapter(forecastAdapter);
+        forecastRecyclerView.setAdapter(forecastAdapter);
 
         RecyclerView savedCitiesRecycler = findViewById(R.id.recycler_saved_cities);
         savedCitiesRecycler.setLayoutManager(new LinearLayoutManager(this));
         savedCityAdapter = new SavedCityAdapter(this::switchCity, this::confirmDeleteCity);
         savedCitiesRecycler.setAdapter(savedCityAdapter);
+    }
+
+    private boolean isTouchInsideView(@Nullable View target, float rawX, float rawY) {
+        if (target == null || target.getVisibility() != View.VISIBLE) {
+            return false;
+        }
+        int[] location = new int[2];
+        target.getLocationOnScreen(location);
+        Rect bounds = new Rect(
+                location[0],
+                location[1],
+                location[0] + target.getWidth(),
+                location[1] + target.getHeight());
+        return bounds.contains((int) rawX, (int) rawY);
+    }
+
+    private int dpToPx(int dp) {
+        float density = getResources().getDisplayMetrics().density;
+        return Math.round(dp * density);
     }
 
     private void setupActions() {
@@ -166,14 +231,10 @@ public class MainActivity extends BaseActivity {
         MaterialButton detailsButton = findViewById(R.id.button_details);
 
         swipeRefreshLayout.setColorSchemeResources(R.color.main_accent);
-        swipeRefreshLayout.setOnRefreshListener(() ->
-                loadPageData(true, getString(R.string.message_main_refreshed))
-        );
+        swipeRefreshLayout.setOnRefreshListener(() -> loadPageData(true, getString(R.string.message_main_refreshed)));
 
         openDrawerButton.setOnClickListener(v -> drawerLayout.openDrawer(GravityCompat.START));
-        settingsButton.setOnClickListener(v ->
-                startActivity(new Intent(this, SettingsActivity.class))
-        );
+        settingsButton.setOnClickListener(v -> startActivity(new Intent(this, SettingsActivity.class)));
         addCityButton.setOnClickListener(v -> {
             if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
                 drawerLayout.closeDrawer(GravityCompat.START);
@@ -213,14 +274,14 @@ public class MainActivity extends BaseActivity {
 
             City current = ensureCurrentCity(user.getId());
             List<City> savedCities = cityRepository.getSavedCities(user.getId());
-            WeatherRepository.WeatherSnapshot snapshot =
-                    weatherRepository.getWeatherSnapshot(current, forceRefresh);
+            WeatherRepository.WeatherSnapshot snapshot = weatherRepository.getWeatherSnapshot(current, forceRefresh);
             CurrentWeather currentWeather = snapshot.getCurrentWeather();
             List<ForecastWeather> forecasts = snapshot.getForecasts();
             Map<String, String> savedCityTemperatures = buildSavedCityTemperatureMap(savedCities, currentWeather);
 
             String message = snackbarMessage;
-            if ((message == null || message.isEmpty()) && snapshot.getMessage() != null && !snapshot.getMessage().isEmpty()) {
+            if ((message == null || message.isEmpty()) && snapshot.getMessage() != null
+                    && !snapshot.getMessage().isEmpty()) {
                 message = snapshot.getMessage();
             }
             MainUiState state = new MainUiState(
@@ -230,8 +291,7 @@ public class MainActivity extends BaseActivity {
                     savedCityTemperatures,
                     currentWeather,
                     forecasts,
-                    message
-            );
+                    message);
             mainHandler.post(() -> renderState(state));
         });
     }
@@ -267,8 +327,7 @@ public class MainActivity extends BaseActivity {
 
             temperaturesByAdCode.put(
                     city.getAdCode(),
-                    getString(R.string.main_saved_city_temp_range, highTemp, lowTemp)
-            );
+                    getString(R.string.main_saved_city_temp_range, highTemp, lowTemp));
         }
         return temperaturesByAdCode;
     }
@@ -301,12 +360,10 @@ public class MainActivity extends BaseActivity {
         highLowView.setText(getString(
                 R.string.main_high_low,
                 state.currentWeather.getHighTemp(),
-                state.currentWeather.getLowTemp()
-        ));
+                state.currentWeather.getLowTemp()));
         reportTimeView.setText(getString(
                 R.string.main_weather_updated_at,
-                refreshedAt
-        ));
+                refreshedAt));
         humidityView.setText(getString(R.string.main_humidity_value, state.currentWeather.getHumidity()));
         windDirectionView.setText(state.currentWeather.getWindDirection());
         windPowerView.setText(state.currentWeather.getWindPower());
@@ -316,8 +373,7 @@ public class MainActivity extends BaseActivity {
         drawerStatusView.setText(getString(R.string.main_welcome_back_plain));
         savedCityCountView.setText(getString(
                 R.string.main_drawer_city_count,
-                state.savedCities.size()
-        ));
+                state.savedCities.size()));
         emptyCitiesView.setVisibility(state.savedCities.isEmpty() ? View.VISIBLE : View.GONE);
 
         forecastAdapter.submitList(state.forecasts);
@@ -368,8 +424,7 @@ public class MainActivity extends BaseActivity {
                 return;
             }
 
-            CityRepository.DeleteCityResult result =
-                    cityRepository.deleteCityForUser(userId, city.getAdCode());
+            CityRepository.DeleteCityResult result = cityRepository.deleteCityForUser(userId, city.getAdCode());
             City nextCurrentCity = cityRepository.getCurrentCity(userId);
             mainHandler.post(() -> handleDeleteCityResult(city, result, nextCurrentCity));
         });
@@ -378,8 +433,7 @@ public class MainActivity extends BaseActivity {
     private void handleDeleteCityResult(
             City deletedCity,
             CityRepository.DeleteCityResult result,
-            @Nullable City nextCurrentCity
-    ) {
+            @Nullable City nextCurrentCity) {
         if (result == CityRepository.DeleteCityResult.LAST_CITY_BLOCKED) {
             Snackbar.make(drawerLayout, R.string.message_city_delete_blocked_last, Snackbar.LENGTH_LONG).show();
             return;
@@ -395,8 +449,7 @@ public class MainActivity extends BaseActivity {
             message = getString(
                     R.string.message_city_deleted_and_switched,
                     deletedCity.getCityName(),
-                    nextCurrentCity.getCityName()
-            );
+                    nextCurrentCity.getCityName());
         } else {
             message = getString(R.string.message_city_deleted, deletedCity.getCityName());
         }
@@ -438,8 +491,7 @@ public class MainActivity extends BaseActivity {
                 Map<String, String> savedCityTemperatures,
                 CurrentWeather currentWeather,
                 List<ForecastWeather> forecasts,
-                @Nullable String message
-        ) {
+                @Nullable String message) {
             this.user = user;
             this.currentCity = currentCity;
             this.savedCities = savedCities;
