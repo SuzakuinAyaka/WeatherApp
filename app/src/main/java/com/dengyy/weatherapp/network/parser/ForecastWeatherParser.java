@@ -40,7 +40,7 @@ public class ForecastWeatherParser {
 
         List<ForecastWeather> futureForecasts = new ArrayList<>();
         int startIndex = casts.length() > 1 ? 1 : 0;
-        for (int i = startIndex; i < casts.length() && futureForecasts.size() < 4; i++) {
+        for (int i = startIndex; i < casts.length() && futureForecasts.size() < 3; i++) {
             JSONObject cast = casts.optJSONObject(i);
             if (cast == null) {
                 continue;

@@ -120,9 +120,7 @@ public class DetailsOfTodayActivity extends BaseActivity {
             CurrentWeather currentWeather = snapshot.getCurrentWeather();
             List<ForecastWeather> forecasts = snapshot.getForecasts();
 
-            CurrentWeather finalCurrentWeather = currentWeather;
-            List<ForecastWeather> finalForecasts = forecasts;
-            runOnUiThread(() -> render(city, finalCurrentWeather, finalForecasts));
+            runOnUiThread(() -> render(city, currentWeather, forecasts));
         });
     }
 
@@ -169,7 +167,7 @@ public class DetailsOfTodayActivity extends BaseActivity {
 
     private String getForecastCountText(@Nullable List<ForecastWeather> forecasts) {
         int count = forecasts == null ? 0 : forecasts.size();
-        return count + " day outlook";
+        return getString(R.string.details_forecast_count_value, count);
     }
 
     private void applyWeatherTheme(@Nullable String weather) {

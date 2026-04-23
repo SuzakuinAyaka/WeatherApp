@@ -152,4 +152,16 @@
     <string name="dialog_delete_city_title">删除 %1$s？</string>
     <string name="dialog_delete_city_message">删除后这个城市会从侧边栏列表移除。</string>
     <string name="dialog_delete_current_city_message">删除后会自动切换到其他已保存城市。</string>
+    <string name="main_forecast_title_3d">未来 3 天</string>
+    <string name="details_overview_title">体感概览</string>
+    <string name="details_condition_label">天气状况</string>
+    <string name="details_humidity_label">湿度</string>
+    <string name="details_wind_direction_label">风向</string>
+    <string name="details_wind_power_label">风力</string>
+    <string name="details_province_label">所属省份</string>
+    <string name="details_forecast_label">预报数量</string>
+    <string name="details_forecast_count_value">未来 %1$d 天预报</string>
+    <string name="main_metric_humidity_label">湿度</string>
+    <string name="main_metric_wind_direction_label">风向</string>
+    <string name="main_metric_wind_power_label">风力</string>
 </resources>

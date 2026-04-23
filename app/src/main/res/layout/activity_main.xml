@@ -262,7 +262,7 @@
                                     <TextView
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
-                                        android:text="Humidity"
+                                        android:text="@string/main_metric_humidity_label"
                                         android:textAppearance="@style/TextAppearance.Material3.LabelLarge"
                                         android:textColor="@color/main_on_surface_soft" />
 
@@ -273,7 +273,7 @@
                                         android:layout_marginTop="8dp"
                                         android:textAppearance="@style/TextAppearance.Material3.TitleLarge"
                                         android:textColor="@color/main_on_surface_strong"
-                                        tools:text="Humidity 58%" />
+                                        tools:text="湿度 58%" />
                                 </LinearLayout>
 
                                 <LinearLayout
@@ -285,7 +285,7 @@
                                     <TextView
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
-                                        android:text="Wind"
+                                        android:text="@string/main_metric_wind_direction_label"
                                         android:textAppearance="@style/TextAppearance.Material3.LabelLarge"
                                         android:textColor="@color/main_on_surface_soft" />
 
@@ -296,7 +296,7 @@
                                         android:layout_marginTop="8dp"
                                         android:textAppearance="@style/TextAppearance.Material3.TitleLarge"
                                         android:textColor="@color/main_on_surface_strong"
-                                        tools:text="Southeast" />
+                                        tools:text="东南风" />
                                 </LinearLayout>
 
                                 <LinearLayout
@@ -308,7 +308,7 @@
                                     <TextView
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
-                                        android:text="Power"
+                                        android:text="@string/main_metric_wind_power_label"
                                         android:textAppearance="@style/TextAppearance.Material3.LabelLarge"
                                         android:textColor="@color/main_on_surface_soft" />
 
@@ -319,7 +319,7 @@
                                         android:layout_marginTop="8dp"
                                         android:textAppearance="@style/TextAppearance.Material3.TitleLarge"
                                         android:textColor="@color/main_on_surface_strong"
-                                        tools:text="Level 3" />
+                                        tools:text="3级" />
                                 </LinearLayout>
                             </LinearLayout>
                         </LinearLayout>
@@ -346,7 +346,7 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="@string/main_forecast_title"
+                                android:text="@string/main_forecast_title_3d"
                                 android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
                                 android:textColor="@color/main_on_surface_strong" />
 

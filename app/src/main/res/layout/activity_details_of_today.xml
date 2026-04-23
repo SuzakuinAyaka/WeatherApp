@@ -78,7 +78,7 @@
                             android:layout_height="wrap_content"
                             android:textAppearance="@style/TextAppearance.Material3.LabelLarge"
                             android:textColor="@color/main_on_surface_soft"
-                            tools:text="Beijing" />
+                            tools:text="北京" />
 
                         <TextView
                             android:id="@+id/text_details_city"
@@ -87,7 +87,7 @@
                             android:layout_marginTop="8dp"
                             android:textAppearance="@style/TextAppearance.Material3.HeadlineMedium"
                             android:textColor="@color/main_on_surface_strong"
-                            tools:text="Beijing" />
+                            tools:text="北京" />
 
                         <LinearLayout
                             android:layout_width="match_parent"
@@ -103,7 +103,7 @@
                                 android:layout_weight="1"
                                 android:textAppearance="@style/TextAppearance.Material3.DisplayMedium"
                                 android:textColor="@color/main_on_surface_strong"
-                                tools:text="26 deg" />
+                                tools:text="26°" />
 
                             <TextView
                                 android:id="@+id/text_details_weather"
@@ -111,7 +111,7 @@
                                 android:layout_height="wrap_content"
                                 android:textAppearance="@style/TextAppearance.Material3.TitleLarge"
                                 android:textColor="@color/main_on_surface_strong"
-                                tools:text="Sunny" />
+                                tools:text="晴" />
                         </LinearLayout>
 
                         <TextView
@@ -121,7 +121,7 @@
                             android:layout_marginTop="10dp"
                             android:textAppearance="@style/TextAppearance.Material3.BodyLarge"
                             android:textColor="@color/main_on_surface_soft"
-                            tools:text="High 28 / Low 20" />
+                            tools:text="最高 28° / 最低 20°" />
 
                         <TextView
                             android:id="@+id/text_details_updated_at"
@@ -130,7 +130,7 @@
                             android:layout_marginTop="6dp"
                             android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
                             android:textColor="@color/main_on_surface_soft"
-                            tools:text="Updated 10:30" />
+                            tools:text="更新时间 10:30" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
@@ -154,7 +154,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Overview"
+                            android:text="@string/details_overview_title"
                             android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
                             android:textColor="@color/main_on_surface_strong" />
 
@@ -173,7 +173,7 @@
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="Condition"
+                                    android:text="@string/details_condition_label"
                                     android:textAppearance="@style/TextAppearance.Material3.LabelLarge"
                                     android:textColor="@color/main_on_surface_soft" />
 
@@ -184,7 +184,7 @@
                                     android:layout_marginTop="8dp"
                                     android:textAppearance="@style/TextAppearance.Material3.TitleLarge"
                                     android:textColor="@color/main_on_surface_strong"
-                                    tools:text="Sunny" />
+                                    tools:text="晴" />
                             </LinearLayout>
 
                             <LinearLayout
@@ -196,7 +196,7 @@
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="Humidity"
+                                    android:text="@string/details_humidity_label"
                                     android:textAppearance="@style/TextAppearance.Material3.LabelLarge"
                                     android:textColor="@color/main_on_surface_soft" />
 
@@ -207,7 +207,7 @@
                                     android:layout_marginTop="8dp"
                                     android:textAppearance="@style/TextAppearance.Material3.TitleLarge"
                                     android:textColor="@color/main_on_surface_strong"
-                                    tools:text="58%" />
+                                    tools:text="湿度 58%" />
                             </LinearLayout>
                         </LinearLayout>
 
@@ -226,7 +226,7 @@
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="Wind direction"
+                                    android:text="@string/details_wind_direction_label"
                                     android:textAppearance="@style/TextAppearance.Material3.LabelLarge"
                                     android:textColor="@color/main_on_surface_soft" />
 
@@ -237,7 +237,7 @@
                                     android:layout_marginTop="8dp"
                                     android:textAppearance="@style/TextAppearance.Material3.TitleLarge"
                                     android:textColor="@color/main_on_surface_strong"
-                                    tools:text="Southeast" />
+                                    tools:text="东南风" />
                             </LinearLayout>
 
                             <LinearLayout
@@ -249,7 +249,7 @@
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="Wind power"
+                                    android:text="@string/details_wind_power_label"
                                     android:textAppearance="@style/TextAppearance.Material3.LabelLarge"
                                     android:textColor="@color/main_on_surface_soft" />
 
@@ -260,7 +260,7 @@
                                     android:layout_marginTop="8dp"
                                     android:textAppearance="@style/TextAppearance.Material3.TitleLarge"
                                     android:textColor="@color/main_on_surface_strong"
-                                    tools:text="Level 3" />
+                                    tools:text="3级" />
                             </LinearLayout>
                         </LinearLayout>
 
@@ -279,7 +279,7 @@
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="Province"
+                                    android:text="@string/details_province_label"
                                     android:textAppearance="@style/TextAppearance.Material3.LabelLarge"
                                     android:textColor="@color/main_on_surface_soft" />
 
@@ -290,7 +290,7 @@
                                     android:layout_marginTop="8dp"
                                     android:textAppearance="@style/TextAppearance.Material3.TitleLarge"
                                     android:textColor="@color/main_on_surface_strong"
-                                    tools:text="Beijing" />
+                                    tools:text="北京" />
                             </LinearLayout>
 
                             <LinearLayout
@@ -302,7 +302,7 @@
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="Forecast"
+                                    android:text="@string/details_forecast_label"
                                     android:textAppearance="@style/TextAppearance.Material3.LabelLarge"
                                     android:textColor="@color/main_on_surface_soft" />
 
@@ -313,7 +313,7 @@
                                     android:layout_marginTop="8dp"
                                     android:textAppearance="@style/TextAppearance.Material3.TitleLarge"
                                     android:textColor="@color/main_on_surface_strong"
-                                    tools:text="4 day outlook" />
+                                    tools:text="未来 3 天预报" />
                             </LinearLayout>
                         </LinearLayout>
                     </LinearLayout>
@@ -339,7 +339,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="@string/main_forecast_title"
+                            android:text="@string/main_forecast_title_3d"
                             android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
                             android:textColor="@color/main_on_surface_strong" />
 
@@ -349,7 +349,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="14dp"
                             android:nestedScrollingEnabled="false"
-                            tools:itemCount="4"
+                            tools:itemCount="3"
                             tools:listitem="@layout/item_details_forecast" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
