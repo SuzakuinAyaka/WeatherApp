@@ -75,4 +75,11 @@
     <color name="settings_danger_bg">#FFF4F2</color>
     <color name="settings_danger_stroke">#F0B8B0</color>
     <color name="settings_danger_text">#A83B2B</color>
+    <color name="add_city_tab_container_bg">#8CF9FCFF</color>
+    <color name="add_city_tab_container_stroke">#40FFFFFF</color>
+    <color name="add_city_tab_indicator_bg">#FF5F9BC2</color>
+    <color name="add_city_tab_indicator_stroke">#FF4D86AB</color>
+    <color name="add_city_tab_text">#688090</color>
+    <color name="add_city_tab_text_selected">#FFFFFF</color>
+    <color name="add_city_tab_ripple">#143A6A8C</color>
 </resources>

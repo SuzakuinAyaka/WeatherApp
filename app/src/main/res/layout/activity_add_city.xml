@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/add_city_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -29,96 +30,77 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/action_back"
             android:padding="10dp"
-            android:src="@android:drawable/ic_menu_revert"
+            android:src="@drawable/ic_arrow_back_24"
             android:tint="@color/md_theme_onPrimaryContainer" />
 
-        <TextView
+        <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_weight="1"
-            android:text="@string/add_city_title"
-            android:textAppearance="@style/TextAppearance.Material3.TitleLarge"
-            android:textColor="@color/md_theme_onPrimaryContainer" />
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/add_city_title"
+                android:textAppearance="@style/TextAppearance.Material3.TitleLarge"
+                android:textColor="@color/md_theme_onPrimaryContainer" />
+
+            <TextView
+                android:id="@+id/text_manage_summary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+                android:textColor="@color/md_theme_onSurfaceVariant"
+                tools:text="当前城市：西安 · 已添加 3 个城市" />
+        </LinearLayout>
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/text_search_hint"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:text="@string/add_city_search_tips"
-        android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
-        android:textColor="@color/md_theme_onSurfaceVariant" />
-
-    <com.google.android.material.card.MaterialCardView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="18dp"
-        app:cardBackgroundColor="@color/auth_card_surface"
-        app:cardCornerRadius="24dp"
-        app:cardElevation="2dp"
-        app:cardUseCompatPadding="true">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="20dp">
-
-            <com.google.android.material.textfield.TextInputLayout
-                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/hint_city_keyword"
-                app:boxStrokeColor="@color/auth_highlight"
-                app:endIconMode="clear_text">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/input_search_city"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:imeOptions="actionSearch"
-                    android:inputType="text"
-                    android:maxLines="1" />
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/button_search_city"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="14dp"
-                android:minHeight="52dp"
-                android:text="@string/action_search_city"
-                app:cornerRadius="16dp" />
-
-            <com.google.android.material.progressindicator.LinearProgressIndicator
-                android:id="@+id/progress_search"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="14dp"
-                android:visibility="gone" />
-        </LinearLayout>
-    </com.google.android.material.card.MaterialCardView>
-
-    <TextView
-        android:id="@+id/text_search_empty"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="18dp"
-        android:gravity="center_horizontal"
-        android:text="@string/empty_city_search_initial"
-        android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
-        android:textColor="@color/md_theme_onSurfaceVariant"
-        android:visibility="gone" />
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recycler_search_result"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="16dp"
         android:layout_weight="1"
-        android:clipToPadding="false"
-        android:paddingBottom="20dp" />
+        android:orientation="vertical">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_add_city_tab_container"
+            android:padding="4dp">
+
+            <com.google.android.material.tabs.TabLayout
+                android:id="@+id/tab_layout_add_city"
+                android:layout_width="match_parent"
+                android:layout_height="44dp"
+                android:background="@android:color/transparent"
+                android:minHeight="44dp"
+                app:tabBackground="@drawable/bg_add_city_tab_item"
+                app:tabGravity="fill"
+                app:tabIndicatorAnimationMode="elastic"
+                app:tabIndicatorColor="@android:color/transparent"
+                app:tabIndicatorHeight="0dp"
+                app:tabIndicatorFullWidth="false"
+                app:tabInlineLabel="true"
+                app:tabMode="fixed"
+                app:tabPaddingStart="18dp"
+                app:tabPaddingTop="0dp"
+                app:tabPaddingEnd="18dp"
+                app:tabPaddingBottom="0dp"
+                app:tabRippleColor="@color/add_city_tab_ripple"
+                app:tabSelectedTextColor="@color/add_city_tab_text_selected"
+                app:tabTextAppearance="@style/TextAppearance.Material3.TitleSmall"
+                app:tabTextColor="@color/add_city_tab_text" />
+        </FrameLayout>
+
+        <androidx.viewpager2.widget.ViewPager2
+            android:id="@+id/view_pager_add_city"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginTop="12dp"
+            android:layout_weight="1" />
+    </LinearLayout>
 
 </LinearLayout>
