@@ -32,7 +32,9 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -195,14 +197,60 @@ public class MainActivity extends BaseActivity {
                     weatherRepository.getWeatherSnapshot(current, forceRefresh);
             CurrentWeather currentWeather = snapshot.getCurrentWeather();
             List<ForecastWeather> forecasts = snapshot.getForecasts();
+            Map<String, String> savedCityTemperatures = buildSavedCityTemperatureMap(savedCities, currentWeather);
 
             String message = snackbarMessage;
             if ((message == null || message.isEmpty()) && snapshot.getMessage() != null && !snapshot.getMessage().isEmpty()) {
                 message = snapshot.getMessage();
             }
-            MainUiState state = new MainUiState(user, current, savedCities, currentWeather, forecasts, message);
+            MainUiState state = new MainUiState(
+                    user,
+                    current,
+                    savedCities,
+                    savedCityTemperatures,
+                    currentWeather,
+                    forecasts,
+                    message
+            );
             mainHandler.post(() -> renderState(state));
         });
+    }
+
+    private Map<String, String> buildSavedCityTemperatureMap(List<City> savedCities, CurrentWeather currentWeather) {
+        Map<String, String> temperaturesByAdCode = new HashMap<>();
+        if (savedCities == null || savedCities.isEmpty()) {
+            return temperaturesByAdCode;
+        }
+
+        for (City city : savedCities) {
+            if (city == null || city.getAdCode() == null || city.getAdCode().trim().isEmpty()) {
+                continue;
+            }
+
+            CurrentWeather cachedWeather;
+            if (currentWeather != null && city.getAdCode().equals(currentWeather.getAdCode())) {
+                cachedWeather = currentWeather;
+            } else {
+                cachedWeather = weatherRepository.getCachedCurrentWeather(city.getAdCode());
+            }
+
+            if (cachedWeather == null) {
+                continue;
+            }
+
+            String highTemp = cachedWeather.getHighTemp();
+            String lowTemp = cachedWeather.getLowTemp();
+            if (highTemp == null || highTemp.trim().isEmpty()
+                    || lowTemp == null || lowTemp.trim().isEmpty()) {
+                continue;
+            }
+
+            temperaturesByAdCode.put(
+                    city.getAdCode(),
+                    getString(R.string.main_saved_city_temp_range, highTemp, lowTemp)
+            );
+        }
+        return temperaturesByAdCode;
     }
 
     private City ensureCurrentCity(long userId) {
@@ -252,7 +300,7 @@ public class MainActivity extends BaseActivity {
         emptyCitiesView.setVisibility(state.savedCities.isEmpty() ? View.VISIBLE : View.GONE);
 
         forecastAdapter.submitList(state.forecasts);
-        savedCityAdapter.submitList(state.savedCities);
+        savedCityAdapter.submitData(state.savedCities, state.savedCityTemperatures);
         applyWeatherTheme(weatherText);
 
         if (state.message != null && !state.message.isEmpty()) {
@@ -405,6 +453,7 @@ public class MainActivity extends BaseActivity {
         private final User user;
         private final City currentCity;
         private final List<City> savedCities;
+        private final Map<String, String> savedCityTemperatures;
         private final CurrentWeather currentWeather;
         private final List<ForecastWeather> forecasts;
         @Nullable
@@ -414,6 +463,7 @@ public class MainActivity extends BaseActivity {
                 User user,
                 City currentCity,
                 List<City> savedCities,
+                Map<String, String> savedCityTemperatures,
                 CurrentWeather currentWeather,
                 List<ForecastWeather> forecasts,
                 @Nullable String message
@@ -421,6 +471,7 @@ public class MainActivity extends BaseActivity {
             this.user = user;
             this.currentCity = currentCity;
             this.savedCities = savedCities;
+            this.savedCityTemperatures = savedCityTemperatures;
             this.currentWeather = currentWeather;
             this.forecasts = forecasts;
             this.message = message;

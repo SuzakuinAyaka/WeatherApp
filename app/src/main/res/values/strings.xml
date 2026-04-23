@@ -97,6 +97,7 @@
     <string name="main_weather_updated_at">更新时间 %1$s</string>
     <string name="main_temperature_unit">%1$s°</string>
     <string name="main_high_low">最高 %1$s° / 最低 %2$s°</string>
+    <string name="main_saved_city_temp_range">%1$s° / %2$s°</string>
     <string name="main_humidity_value">湿度 %1$s%%</string>
     <string name="main_wind_value">%1$s  %2$s</string>
     <string name="main_city_tag_current">当前城市</string>

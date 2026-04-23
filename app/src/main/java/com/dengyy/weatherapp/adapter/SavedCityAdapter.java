@@ -13,7 +13,9 @@ import com.dengyy.weatherapp.model.City;
 import com.google.android.material.card.MaterialCardView;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class SavedCityAdapter extends RecyclerView.Adapter<SavedCityAdapter.ViewHolder> {
 
@@ -26,6 +28,7 @@ public class SavedCityAdapter extends RecyclerView.Adapter<SavedCityAdapter.View
     }
 
     private final List<City> items = new ArrayList<>();
+    private final Map<String, String> cachedTemperatureMap = new HashMap<>();
     private final OnCityClickListener onCityClickListener;
     private final OnCityLongClickListener onCityLongClickListener;
 
@@ -37,10 +40,14 @@ public class SavedCityAdapter extends RecyclerView.Adapter<SavedCityAdapter.View
         this.onCityLongClickListener = onCityLongClickListener;
     }
 
-    public void submitList(List<City> cities) {
+    public void submitData(List<City> cities, Map<String, String> temperaturesByAdCode) {
         items.clear();
+        cachedTemperatureMap.clear();
         if (cities != null) {
             items.addAll(cities);
+        }
+        if (temperaturesByAdCode != null) {
+            cachedTemperatureMap.putAll(temperaturesByAdCode);
         }
         notifyDataSetChanged();
     }
@@ -60,6 +67,14 @@ public class SavedCityAdapter extends RecyclerView.Adapter<SavedCityAdapter.View
         holder.subtitleView.setText(city.isCurrent()
                 ? holder.itemView.getContext().getString(R.string.main_city_tag_current)
                 : city.getProvince());
+        String temperatureRange = cachedTemperatureMap.get(city.getAdCode());
+        if (temperatureRange != null && !temperatureRange.trim().isEmpty()) {
+            holder.temperatureView.setVisibility(View.VISIBLE);
+            holder.temperatureView.setText(temperatureRange);
+        } else {
+            holder.temperatureView.setVisibility(View.GONE);
+            holder.temperatureView.setText(null);
+        }
 
         if (city.isCurrent()) {
             holder.cardView.setCardBackgroundColor(
@@ -105,12 +120,14 @@ public class SavedCityAdapter extends RecyclerView.Adapter<SavedCityAdapter.View
         private final MaterialCardView cardView;
         private final TextView titleView;
         private final TextView subtitleView;
+        private final TextView temperatureView;
 
         ViewHolder(@NonNull View itemView) {
             super(itemView);
             cardView = itemView.findViewById(R.id.card_city_item);
             titleView = itemView.findViewById(R.id.text_city_name);
             subtitleView = itemView.findViewById(R.id.text_city_meta);
+            temperatureView = itemView.findViewById(R.id.text_city_temp_range);
         }
     }
 }
