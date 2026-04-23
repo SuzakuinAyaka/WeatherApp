@@ -16,7 +16,16 @@ import java.util.List;
 
 public class CitySearchAdapter extends RecyclerView.Adapter<CitySearchAdapter.ViewHolder> {
 
+    public interface OnCityClickListener {
+        void onCityClick(City city);
+    }
+
     private final List<City> items = new ArrayList<>();
+    private final OnCityClickListener onCityClickListener;
+
+    public CitySearchAdapter(OnCityClickListener onCityClickListener) {
+        this.onCityClickListener = onCityClickListener;
+    }
 
     public void submitList(List<City> cities) {
         items.clear();
@@ -29,7 +38,8 @@ public class CitySearchAdapter extends RecyclerView.Adapter<CitySearchAdapter.Vi
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_simple_text, parent, false);
+        View view = LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.item_city_search, parent, false);
         return new ViewHolder(view);
     }
 
@@ -38,6 +48,11 @@ public class CitySearchAdapter extends RecyclerView.Adapter<CitySearchAdapter.Vi
         City city = items.get(position);
         holder.titleView.setText(city.getCityName());
         holder.subtitleView.setText(city.getProvince());
+        holder.itemView.setOnClickListener(v -> {
+            if (onCityClickListener != null) {
+                onCityClickListener.onCityClick(city);
+            }
+        });
     }
 
     @Override

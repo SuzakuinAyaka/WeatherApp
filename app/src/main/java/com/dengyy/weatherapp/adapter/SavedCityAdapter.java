@@ -21,11 +21,20 @@ public class SavedCityAdapter extends RecyclerView.Adapter<SavedCityAdapter.View
         void onCityClick(City city);
     }
 
+    public interface OnCityLongClickListener {
+        void onCityLongClick(City city);
+    }
+
     private final List<City> items = new ArrayList<>();
     private final OnCityClickListener onCityClickListener;
+    private final OnCityLongClickListener onCityLongClickListener;
 
-    public SavedCityAdapter(OnCityClickListener onCityClickListener) {
+    public SavedCityAdapter(
+            OnCityClickListener onCityClickListener,
+            OnCityLongClickListener onCityLongClickListener
+    ) {
         this.onCityClickListener = onCityClickListener;
+        this.onCityLongClickListener = onCityLongClickListener;
     }
 
     public void submitList(List<City> cities) {
@@ -71,6 +80,13 @@ public class SavedCityAdapter extends RecyclerView.Adapter<SavedCityAdapter.View
             if (onCityClickListener != null) {
                 onCityClickListener.onCityClick(city);
             }
+        });
+        holder.itemView.setOnLongClickListener(v -> {
+            if (onCityLongClickListener != null) {
+                onCityLongClickListener.onCityLongClick(city);
+                return true;
+            }
+            return false;
         });
     }
 

@@ -28,6 +28,7 @@ import com.dengyy.weatherapp.repository.CityRepository;
 import com.dengyy.weatherapp.repository.UserRepository;
 import com.dengyy.weatherapp.repository.WeatherRepository;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -132,7 +133,7 @@ public class MainActivity extends BaseActivity {
 
         RecyclerView savedCitiesRecycler = findViewById(R.id.recycler_saved_cities);
         savedCitiesRecycler.setLayoutManager(new LinearLayoutManager(this));
-        savedCityAdapter = new SavedCityAdapter(this::switchCity);
+        savedCityAdapter = new SavedCityAdapter(this::switchCity, this::confirmDeleteCity);
         savedCitiesRecycler.setAdapter(savedCityAdapter);
     }
 
@@ -276,6 +277,64 @@ public class MainActivity extends BaseActivity {
             mainHandler.post(() -> drawerLayout.closeDrawer(GravityCompat.START));
             loadPageData(false, getString(R.string.message_city_switched, city.getCityName()));
         });
+    }
+
+    private void confirmDeleteCity(City city) {
+        if (city == null) {
+            return;
+        }
+        int messageResId = city.isCurrent()
+                ? R.string.dialog_delete_current_city_message
+                : R.string.dialog_delete_city_message;
+        new MaterialAlertDialogBuilder(this)
+                .setTitle(getString(R.string.dialog_delete_city_title, city.getCityName()))
+                .setMessage(messageResId)
+                .setNegativeButton(R.string.action_cancel, null)
+                .setPositiveButton(R.string.action_delete, (dialog, which) -> deleteCity(city))
+                .show();
+    }
+
+    private void deleteCity(City city) {
+        executor.execute(() -> {
+            long userId = userRepository.getLoginUserId();
+            if (userId <= 0) {
+                mainHandler.post(this::navigateToLogin);
+                return;
+            }
+
+            CityRepository.DeleteCityResult result =
+                    cityRepository.deleteCityForUser(userId, city.getAdCode());
+            City nextCurrentCity = cityRepository.getCurrentCity(userId);
+            mainHandler.post(() -> handleDeleteCityResult(city, result, nextCurrentCity));
+        });
+    }
+
+    private void handleDeleteCityResult(
+            City deletedCity,
+            CityRepository.DeleteCityResult result,
+            @Nullable City nextCurrentCity
+    ) {
+        if (result == CityRepository.DeleteCityResult.LAST_CITY_BLOCKED) {
+            Snackbar.make(drawerLayout, R.string.message_city_delete_blocked_last, Snackbar.LENGTH_LONG).show();
+            return;
+        }
+        if (result == CityRepository.DeleteCityResult.NOT_FOUND) {
+            Snackbar.make(drawerLayout, R.string.message_city_delete_failed, Snackbar.LENGTH_LONG).show();
+            return;
+        }
+
+        drawerLayout.closeDrawer(GravityCompat.START);
+        String message;
+        if (deletedCity.isCurrent() && nextCurrentCity != null) {
+            message = getString(
+                    R.string.message_city_deleted_and_switched,
+                    deletedCity.getCityName(),
+                    nextCurrentCity.getCityName()
+            );
+        } else {
+            message = getString(R.string.message_city_deleted, deletedCity.getCityName());
+        }
+        loadPageData(false, message);
     }
 
     private void navigateToLogin() {
