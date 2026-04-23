@@ -18,9 +18,9 @@ import java.util.List;
 
 public class CityRepository {
 
-    public static final String DEFAULT_CITY_NAME = "\u897f\u5b89";
+    public static final String DEFAULT_CITY_NAME = "西安";
     public static final String DEFAULT_CITY_AD_CODE = "610100";
-    public static final String DEFAULT_CITY_PROVINCE = "\u9655\u897f";
+    public static final String DEFAULT_CITY_PROVINCE = "陕西";
 
     public static final String SAMPLE_SUNNY_AD_CODE = "debug_sunny";
     public static final String SAMPLE_RAIN_AD_CODE = "debug_rain";
@@ -106,10 +106,10 @@ public class CityRepository {
             return;
         }
         if (enabled) {
-            ensureStoredCity(userId, "\u6674\u5929\u793a\u4f8b", SAMPLE_SUNNY_AD_CODE, "\u8c03\u8bd5");
-            ensureStoredCity(userId, "\u96e8\u5929\u793a\u4f8b", SAMPLE_RAIN_AD_CODE, "\u8c03\u8bd5");
-            ensureStoredCity(userId, "\u591a\u4e91\u793a\u4f8b", SAMPLE_CLOUDY_AD_CODE, "\u8c03\u8bd5");
-            ensureStoredCity(userId, "\u96ea\u5929\u793a\u4f8b", SAMPLE_SNOW_AD_CODE, "\u8c03\u8bd5");
+            ensureStoredCity(userId, "北京（测试）", SAMPLE_SUNNY_AD_CODE, "北京");
+            ensureStoredCity(userId, "上海（测试）", SAMPLE_RAIN_AD_CODE, "上海");
+            ensureStoredCity(userId, "成都（测试）", SAMPLE_CLOUDY_AD_CODE, "四川");
+            ensureStoredCity(userId, "哈尔滨（测试）", SAMPLE_SNOW_AD_CODE, "黑龙江");
             return;
         }
 
