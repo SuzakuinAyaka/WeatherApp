@@ -56,6 +56,7 @@
     <color name="main_bg_snow_bottom">#F7FBFE</color>
     <color name="main_card_surface">#F7FBFE</color>
     <color name="main_card_surface_strong">#FCFDFE</color>
+    <color name="main_drawer_profile_card_surface">#EDF3F7</color>
     <color name="main_forecast_item_surface">#E7F1F8</color>
     <color name="main_card_stroke">#26FFFFFF</color>
     <color name="main_on_surface_strong">#112433</color>

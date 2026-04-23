@@ -28,6 +28,7 @@
     <color name="main_bg_snow_bottom">#111A22</color>
     <color name="main_card_surface">#1D2A35</color>
     <color name="main_card_surface_strong">#22313D</color>
+    <color name="main_drawer_profile_card_surface">#1A242D</color>
     <color name="main_forecast_item_surface">#2A3A47</color>
     <color name="main_card_stroke">#2AFFFFFF</color>
     <color name="main_on_surface_strong">#E7F0F6</color>
