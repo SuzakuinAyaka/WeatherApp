@@ -2,6 +2,9 @@ package com.dengyy.weatherapp.ui;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
+import android.util.Patterns;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -21,6 +24,9 @@ import com.dengyy.weatherapp.utils.SPUtils;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.materialswitch.MaterialSwitch;
+import com.google.android.material.snackbar.Snackbar;
+import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 
 public class SettingsActivity extends BaseActivity {
 
@@ -29,6 +35,7 @@ public class SettingsActivity extends BaseActivity {
 
     private UserRepository userRepository;
     private CityRepository cityRepository;
+    private View rootView;
     private LinearLayout themeModeLayout;
     private Spinner themeModeInput;
     private MaterialSwitch debugSampleSwitch;
@@ -48,6 +55,7 @@ public class SettingsActivity extends BaseActivity {
     }
 
     private void bindStaticContent() {
+        rootView = findViewById(R.id.settings_root);
         TextView versionView = findViewById(R.id.text_version);
         versionView.setText(getString(R.string.settings_version_label) + " / " + getAppVersionName());
 
@@ -134,8 +142,12 @@ public class SettingsActivity extends BaseActivity {
     private void bindActions() {
         ImageButton backButton = findViewById(R.id.button_back);
         MaterialButton logoutButton = findViewById(R.id.button_logout);
+        MaterialButton editProfileButton = findViewById(R.id.button_edit_profile);
+        MaterialButton changePasswordButton = findViewById(R.id.button_change_password);
 
         backButton.setOnClickListener(v -> finish());
+        editProfileButton.setOnClickListener(v -> showEditProfileDialog());
+        changePasswordButton.setOnClickListener(v -> showChangePasswordDialog());
         logoutButton.setOnClickListener(v -> new MaterialAlertDialogBuilder(this)
                 .setTitle(R.string.settings_logout_confirm_title)
                 .setMessage(R.string.settings_logout_confirm_message)
@@ -145,6 +157,171 @@ public class SettingsActivity extends BaseActivity {
                     navigateToLogin();
                 })
                 .show());
+    }
+
+    private void showEditProfileDialog() {
+        User user = userRepository.getLoginUser();
+        if (user == null) {
+            navigateToLogin();
+            return;
+        }
+
+        View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_edit_profile, null, false);
+        TextInputLayout usernameLayout = dialogView.findViewById(R.id.layout_edit_username);
+        TextInputLayout phoneLayout = dialogView.findViewById(R.id.layout_edit_phone);
+        TextInputLayout emailLayout = dialogView.findViewById(R.id.layout_edit_email);
+        TextInputEditText usernameInput = dialogView.findViewById(R.id.input_edit_username);
+        TextInputEditText phoneInput = dialogView.findViewById(R.id.input_edit_phone);
+        TextInputEditText emailInput = dialogView.findViewById(R.id.input_edit_email);
+
+        usernameInput.setText(user.getUsername());
+        phoneInput.setText(user.getPhone());
+        emailInput.setText(user.getEmail());
+
+        androidx.appcompat.app.AlertDialog dialog = new MaterialAlertDialogBuilder(this)
+                .setTitle(R.string.settings_edit_profile_title)
+                .setMessage(R.string.settings_edit_profile_message)
+                .setView(dialogView)
+                .setNegativeButton(R.string.action_cancel, null)
+                .setPositiveButton(R.string.action_save, null)
+                .create();
+        dialog.setOnShowListener(ignored -> dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE)
+                .setOnClickListener(v -> {
+                    clearError(usernameLayout, phoneLayout, emailLayout);
+                    String username = getText(usernameInput);
+                    String phone = getText(phoneInput);
+                    String email = getText(emailInput);
+
+                    boolean hasError = false;
+                    if (TextUtils.isEmpty(username)) {
+                        usernameLayout.setError(getString(R.string.error_account_required));
+                        hasError = true;
+                    } else if (username.length() < 3) {
+                        usernameLayout.setError(getString(R.string.error_account_too_short));
+                        hasError = true;
+                    }
+                    if (TextUtils.isEmpty(phone)) {
+                        phoneLayout.setError(getString(R.string.error_phone_required));
+                        hasError = true;
+                    } else if (!Patterns.PHONE.matcher(phone).matches()) {
+                        phoneLayout.setError(getString(R.string.error_invalid_phone));
+                        hasError = true;
+                    }
+                    if (!TextUtils.isEmpty(email) && !Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                        emailLayout.setError(getString(R.string.error_invalid_email));
+                        hasError = true;
+                    }
+                    if (hasError) {
+                        return;
+                    }
+
+                    UserRepository.UpdateProfileResult result =
+                            userRepository.updateProfile(user.getId(), username, email, phone);
+                    if (result == UserRepository.UpdateProfileResult.USERNAME_EXISTS) {
+                        usernameLayout.setError(getString(R.string.error_account_exists));
+                        return;
+                    }
+                    if (result != UserRepository.UpdateProfileResult.SUCCESS) {
+                        showMessage(getString(R.string.error_unknown));
+                        return;
+                    }
+
+                    bindUserContent();
+                    showMessage(getString(R.string.message_profile_updated));
+                    dialog.dismiss();
+                }));
+        dialog.show();
+    }
+
+    private void showChangePasswordDialog() {
+        User user = userRepository.getLoginUser();
+        if (user == null) {
+            navigateToLogin();
+            return;
+        }
+
+        View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_change_password, null, false);
+        TextInputLayout currentPasswordLayout = dialogView.findViewById(R.id.layout_current_password);
+        TextInputLayout newPasswordLayout = dialogView.findViewById(R.id.layout_new_password);
+        TextInputLayout confirmPasswordLayout = dialogView.findViewById(R.id.layout_confirm_new_password);
+        TextInputEditText currentPasswordInput = dialogView.findViewById(R.id.input_current_password);
+        TextInputEditText newPasswordInput = dialogView.findViewById(R.id.input_new_password);
+        TextInputEditText confirmPasswordInput = dialogView.findViewById(R.id.input_confirm_new_password);
+
+        androidx.appcompat.app.AlertDialog dialog = new MaterialAlertDialogBuilder(this)
+                .setTitle(R.string.settings_change_password_title)
+                .setMessage(R.string.settings_change_password_message)
+                .setView(dialogView)
+                .setNegativeButton(R.string.action_cancel, null)
+                .setPositiveButton(R.string.action_change_password, null)
+                .create();
+        dialog.setOnShowListener(ignored -> dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE)
+                .setOnClickListener(v -> {
+                    clearError(currentPasswordLayout, newPasswordLayout, confirmPasswordLayout);
+                    String currentPassword = getText(currentPasswordInput);
+                    String newPassword = getText(newPasswordInput);
+                    String confirmPassword = getText(confirmPasswordInput);
+
+                    boolean hasError = false;
+                    if (TextUtils.isEmpty(currentPassword)) {
+                        currentPasswordLayout.setError(getString(R.string.error_current_password_required));
+                        hasError = true;
+                    }
+                    if (TextUtils.isEmpty(newPassword)) {
+                        newPasswordLayout.setError(getString(R.string.error_password_required));
+                        hasError = true;
+                    } else if (newPassword.length() < 6) {
+                        newPasswordLayout.setError(getString(R.string.error_password_too_short));
+                        hasError = true;
+                    }
+                    if (!TextUtils.equals(newPassword, confirmPassword)) {
+                        confirmPasswordLayout.setError(getString(R.string.error_password_not_match));
+                        hasError = true;
+                    }
+                    if (hasError) {
+                        return;
+                    }
+
+                    new MaterialAlertDialogBuilder(this)
+                            .setTitle(R.string.settings_change_password_confirm_title)
+                            .setMessage(R.string.settings_change_password_confirm_message)
+                            .setNegativeButton(R.string.action_cancel, null)
+                            .setPositiveButton(R.string.action_confirm, (confirmDialog, which) -> {
+                                UserRepository.ChangePasswordResult result =
+                                        userRepository.changePassword(user.getId(), currentPassword, newPassword);
+                                if (result == UserRepository.ChangePasswordResult.WRONG_PASSWORD) {
+                                    currentPasswordLayout.setError(getString(R.string.error_password_incorrect));
+                                    return;
+                                }
+                                if (result != UserRepository.ChangePasswordResult.SUCCESS) {
+                                    showMessage(getString(R.string.error_unknown));
+                                    return;
+                                }
+                                showMessage(getString(R.string.message_password_changed));
+                                dialog.dismiss();
+                            })
+                            .show();
+                }));
+        dialog.show();
+    }
+
+    private void clearError(TextInputLayout... layouts) {
+        if (layouts == null) {
+            return;
+        }
+        for (TextInputLayout layout : layouts) {
+            if (layout != null) {
+                layout.setError(null);
+            }
+        }
+    }
+
+    private String getText(TextInputEditText editText) {
+        return editText.getText() == null ? "" : editText.getText().toString().trim();
+    }
+
+    private void showMessage(String message) {
+        Snackbar.make(rootView, message, Snackbar.LENGTH_LONG).show();
     }
 
     private String valueOrFallback(String value) {

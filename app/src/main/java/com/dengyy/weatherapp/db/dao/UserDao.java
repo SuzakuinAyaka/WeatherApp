@@ -45,6 +45,21 @@ public class UserDao {
         ) > 0;
     }
 
+    public boolean updateProfile(long userId, String username, String email, String phone) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(Constants.COL_USERNAME, username);
+        values.put(Constants.COL_EMAIL, email);
+        values.put(Constants.COL_PHONE, phone);
+        values.put(Constants.COL_UPDATED_AT, System.currentTimeMillis());
+        return db.update(
+                Constants.TABLE_USERS,
+                values,
+                Constants.COL_ID + "=?",
+                new String[]{String.valueOf(userId)}
+        ) > 0;
+    }
+
     public boolean updateCurrentCity(long userId, String adCode) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -66,6 +81,24 @@ public class UserDao {
                     new String[]{Constants.COL_ID},
                     Constants.COL_USERNAME + "=?",
                     new String[]{username},
+                    null,
+                    null,
+                    null
+            );
+            return cursor.moveToFirst();
+        } finally {
+            closeCursor(cursor);
+        }
+    }
+
+    public boolean existsByUsernameExceptId(String username, long excludedUserId) {
+        Cursor cursor = null;
+        try {
+            cursor = dbHelper.getReadableDatabase().query(
+                    Constants.TABLE_USERS,
+                    new String[]{Constants.COL_ID},
+                    Constants.COL_USERNAME + "=? AND " + Constants.COL_ID + "<>?",
+                    new String[]{username, String.valueOf(excludedUserId)},
                     null,
                     null,
                     null

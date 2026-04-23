@@ -30,6 +30,20 @@ public class UserRepository {
         IDENTITY_MISMATCH
     }
 
+    public enum UpdateProfileResult {
+        SUCCESS,
+        USER_NOT_FOUND,
+        INVALID_INPUT,
+        USERNAME_EXISTS
+    }
+
+    public enum ChangePasswordResult {
+        SUCCESS,
+        USER_NOT_FOUND,
+        WRONG_PASSWORD,
+        INVALID_INPUT
+    }
+
     private final UserDao userDao;
     private final Context appContext;
 
@@ -87,6 +101,46 @@ public class UserRepository {
 
         boolean success = userDao.updatePassword(user.getId(), MD5Utils.hash(newPassword));
         return success ? ResetPasswordResult.SUCCESS : ResetPasswordResult.IDENTITY_MISMATCH;
+    }
+
+    public UpdateProfileResult updateProfile(long userId, String username, String email, String phone) {
+        User user = userDao.findById(userId);
+        if (user == null) {
+            return UpdateProfileResult.USER_NOT_FOUND;
+        }
+
+        String trimmedUsername = username == null ? "" : username.trim();
+        String trimmedEmail = email == null ? "" : email.trim();
+        String trimmedPhone = phone == null ? "" : phone.trim();
+
+        if (TextUtils.isEmpty(trimmedUsername) || trimmedUsername.length() < 3 || TextUtils.isEmpty(trimmedPhone)) {
+            return UpdateProfileResult.INVALID_INPUT;
+        }
+        if (userDao.existsByUsernameExceptId(trimmedUsername, userId)) {
+            return UpdateProfileResult.USERNAME_EXISTS;
+        }
+
+        boolean success = userDao.updateProfile(userId, trimmedUsername, trimmedEmail, trimmedPhone);
+        if (success) {
+            SPUtils.saveLoginUser(appContext, userId, trimmedUsername);
+            return UpdateProfileResult.SUCCESS;
+        }
+        return UpdateProfileResult.INVALID_INPUT;
+    }
+
+    public ChangePasswordResult changePassword(long userId, String currentPassword, String newPassword) {
+        User user = userDao.findById(userId);
+        if (user == null) {
+            return ChangePasswordResult.USER_NOT_FOUND;
+        }
+        if (TextUtils.isEmpty(currentPassword) || TextUtils.isEmpty(newPassword) || newPassword.length() < 6) {
+            return ChangePasswordResult.INVALID_INPUT;
+        }
+        if (!MD5Utils.hash(currentPassword).equals(user.getPassword())) {
+            return ChangePasswordResult.WRONG_PASSWORD;
+        }
+        boolean success = userDao.updatePassword(userId, MD5Utils.hash(newPassword));
+        return success ? ChangePasswordResult.SUCCESS : ChangePasswordResult.INVALID_INPUT;
     }
 
     public boolean isLoggedIn() {
