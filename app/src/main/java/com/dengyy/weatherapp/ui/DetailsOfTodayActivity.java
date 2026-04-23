@@ -4,7 +4,6 @@ import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
-import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
@@ -22,6 +21,9 @@ import com.dengyy.weatherapp.repository.CityRepository;
 import com.dengyy.weatherapp.repository.UserRepository;
 import com.dengyy.weatherapp.repository.WeatherRepository;
 import com.dengyy.weatherapp.utils.DateUtils;
+import com.dengyy.weatherapp.utils.NetworkUtils;
+import com.google.android.material.appbar.MaterialToolbar;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -36,6 +38,7 @@ public class DetailsOfTodayActivity extends BaseActivity {
     private WeatherRepository weatherRepository;
 
     private View rootView;
+    private MaterialToolbar toolbar;
     private TextView cityView;
     private TextView provinceView;
     private TextView weatherView;
@@ -49,6 +52,7 @@ public class DetailsOfTodayActivity extends BaseActivity {
     private TextView provinceValueView;
     private TextView forecastCountView;
     private DetailsForecastAdapter forecastAdapter;
+    private int latestLoadToken;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -74,6 +78,7 @@ public class DetailsOfTodayActivity extends BaseActivity {
 
     private void bindViews() {
         rootView = findViewById(R.id.details_root);
+        toolbar = findViewById(R.id.toolbar_details);
         cityView = findViewById(R.id.text_details_city);
         provinceView = findViewById(R.id.text_details_province);
         weatherView = findViewById(R.id.text_details_weather);
@@ -89,8 +94,7 @@ public class DetailsOfTodayActivity extends BaseActivity {
     }
 
     private void setupActions() {
-        ImageButton backButton = findViewById(R.id.button_details_back);
-        backButton.setOnClickListener(v -> finish());
+        toolbar.setNavigationOnClickListener(v -> finish());
     }
 
     private void setupForecastList() {
@@ -102,6 +106,7 @@ public class DetailsOfTodayActivity extends BaseActivity {
     }
 
     private void loadWeatherDetails() {
+        final int loadToken = ++latestLoadToken;
         executor.execute(() -> {
             User user = userRepository.getLoginUser();
             if (user == null) {
@@ -117,12 +122,47 @@ public class DetailsOfTodayActivity extends BaseActivity {
                 return;
             }
 
-            WeatherRepository.WeatherSnapshot snapshot = weatherRepository.getWeatherSnapshot(city, false);
-            CurrentWeather currentWeather = snapshot.getCurrentWeather();
-            List<ForecastWeather> forecasts = snapshot.getForecasts();
+            WeatherRepository.WeatherSnapshot cachedSnapshot = weatherRepository.getCachedSnapshot(city);
+            if (loadToken == latestLoadToken) {
+                runOnUiThread(() -> render(
+                        city,
+                        cachedSnapshot.getCurrentWeather(),
+                        cachedSnapshot.getForecasts()));
+            }
 
-            runOnUiThread(() -> render(city, currentWeather, forecasts));
+            if (!NetworkUtils.isConnected(this)) {
+                if (loadToken == latestLoadToken) {
+                    runOnUiThread(() -> {
+                        if (hasUsableWeatherData(cachedSnapshot.getCurrentWeather(), cachedSnapshot.getForecasts())) {
+                            Snackbar.make(rootView, R.string.message_details_offline_cache, Snackbar.LENGTH_LONG).show();
+                        } else {
+                            Snackbar.make(rootView, R.string.message_details_empty_no_network, Snackbar.LENGTH_LONG).show();
+                        }
+                    });
+                }
+                return;
+            }
+
+            WeatherRepository.WeatherSnapshot freshSnapshot = weatherRepository.getWeatherSnapshot(city, true);
+            if (loadToken != latestLoadToken) {
+                return;
+            }
+            runOnUiThread(() -> {
+                render(city, freshSnapshot.getCurrentWeather(), freshSnapshot.getForecasts());
+                if (!TextUtils.isEmpty(freshSnapshot.getMessage())) {
+                    Snackbar.make(rootView, freshSnapshot.getMessage(), Snackbar.LENGTH_LONG).show();
+                }
+            });
         });
+    }
+
+    private boolean hasUsableWeatherData(
+            @Nullable CurrentWeather currentWeather,
+            @Nullable List<ForecastWeather> forecasts) {
+        if (currentWeather != null && !TextUtils.equals("--", currentWeather.getWeather())) {
+            return true;
+        }
+        return forecasts != null && !forecasts.isEmpty();
     }
 
     @Nullable
@@ -141,6 +181,7 @@ public class DetailsOfTodayActivity extends BaseActivity {
     }
 
     private void render(City city, CurrentWeather currentWeather, List<ForecastWeather> forecasts) {
+        toolbar.setTitle(city.getCityName());
         cityView.setText(city.getCityName());
         provinceView.setText(city.getProvince());
         weatherView.setText(currentWeather.getWeather());
@@ -184,5 +225,8 @@ public class DetailsOfTodayActivity extends BaseActivity {
                 }
         );
         rootView.setBackground(gradientDrawable);
+        if (toolbar.getNavigationIcon() != null) {
+            toolbar.getNavigationIcon().mutate().setTint(getColor(R.color.main_on_surface_strong));
+        }
     }
 }

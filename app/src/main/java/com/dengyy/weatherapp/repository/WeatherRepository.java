@@ -55,6 +55,18 @@ public class WeatherRepository {
         return forecastWeatherDao.getByAdCode(adCode);
     }
 
+    public WeatherSnapshot getCachedSnapshot(City city) {
+        CurrentWeather cachedCurrent = getCachedCurrentWeather(city.getAdCode());
+        List<ForecastWeather> cachedForecasts = getCachedForecastWeather(city.getAdCode());
+        CurrentWeather currentWeather = cachedCurrent != null
+                ? cachedCurrent
+                : buildEmptyCurrentWeather(city);
+        List<ForecastWeather> forecasts = cachedForecasts != null
+                ? cachedForecasts
+                : Collections.emptyList();
+        return new WeatherSnapshot(currentWeather, forecasts, true, null);
+    }
+
     public WeatherSnapshot getWeatherSnapshot(City city, boolean forceRefresh) {
         if (CityRepository.isDebugSampleCityAdCode(city.getAdCode())) {
             return buildDebugSampleSnapshot(city);
@@ -142,7 +154,7 @@ public class WeatherRepository {
         weather.setHighTemp("--");
         weather.setLowTemp("--");
         weather.setReportTime("--");
-        weather.setCacheTime(System.currentTimeMillis());
+        weather.setCacheTime(0L);
         return weather;
     }
 
