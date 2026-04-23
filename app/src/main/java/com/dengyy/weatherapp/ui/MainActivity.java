@@ -54,8 +54,6 @@ public class MainActivity extends BaseActivity {
     private SwipeRefreshLayout swipeRefreshLayout;
     private View drawerContainer;
     private WeatherBackgroundView weatherBackgroundView;
-    private TextView toolbarCityView;
-    private TextView toolbarSummaryView;
     private TextView cityView;
     private TextView temperatureView;
     private TextView weatherView;
@@ -111,8 +109,6 @@ public class MainActivity extends BaseActivity {
         swipeRefreshLayout = findViewById(R.id.swipe_refresh);
         drawerContainer = findViewById(R.id.drawer_container);
         weatherBackgroundView = findViewById(R.id.view_weather_background);
-        toolbarCityView = findViewById(R.id.text_toolbar_city);
-        toolbarSummaryView = findViewById(R.id.text_toolbar_summary);
         cityView = findViewById(R.id.text_current_city);
         temperatureView = findViewById(R.id.text_temperature);
         weatherView = findViewById(R.id.text_weather_placeholder);
@@ -165,7 +161,6 @@ public class MainActivity extends BaseActivity {
 
     private void setupActions() {
         ImageButton openDrawerButton = findViewById(R.id.button_open_drawer);
-        ImageButton refreshButton = findViewById(R.id.button_refresh);
         ImageButton settingsButton = findViewById(R.id.button_settings);
         ExtendedFloatingActionButton addCityButton = findViewById(R.id.button_add_city);
         MaterialButton detailsButton = findViewById(R.id.button_details);
@@ -176,10 +171,6 @@ public class MainActivity extends BaseActivity {
         );
 
         openDrawerButton.setOnClickListener(v -> drawerLayout.openDrawer(GravityCompat.START));
-        refreshButton.setOnClickListener(v -> {
-            swipeRefreshLayout.setRefreshing(true);
-            loadPageData(true, getString(R.string.message_main_refreshed));
-        });
         settingsButton.setOnClickListener(v ->
                 startActivity(new Intent(this, SettingsActivity.class))
         );
@@ -304,8 +295,6 @@ public class MainActivity extends BaseActivity {
                 ? DateUtils.format(state.currentWeather.getCacheTime())
                 : "--";
 
-        toolbarCityView.setText(cityName);
-        toolbarSummaryView.setText(weatherText + " / " + temperature);
         cityView.setText(cityName);
         temperatureView.setText(temperature);
         weatherView.setText(weatherText);
