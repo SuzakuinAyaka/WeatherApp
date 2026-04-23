@@ -22,7 +22,6 @@ import com.dengyy.weatherapp.repository.CityRepository;
 import com.dengyy.weatherapp.repository.UserRepository;
 import com.dengyy.weatherapp.repository.WeatherRepository;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -117,17 +116,9 @@ public class DetailsOfTodayActivity extends BaseActivity {
                 return;
             }
 
-            CurrentWeather currentWeather = weatherRepository.getCachedCurrentWeather(city.getAdCode());
-            if (currentWeather == null) {
-                currentWeather = weatherRepository.createMockCurrentWeather(city.getAdCode(), city.getCityName());
-                weatherRepository.cacheCurrentWeather(currentWeather);
-            }
-
-            List<ForecastWeather> forecasts = weatherRepository.getCachedForecastWeather(city.getAdCode());
-            if (forecasts == null || forecasts.isEmpty()) {
-                forecasts = weatherRepository.createMockForecastWeather(city.getAdCode(), city.getCityName());
-                weatherRepository.cacheForecastWeather(city.getAdCode(), forecasts);
-            }
+            WeatherRepository.WeatherSnapshot snapshot = weatherRepository.getWeatherSnapshot(city, false);
+            CurrentWeather currentWeather = snapshot.getCurrentWeather();
+            List<ForecastWeather> forecasts = snapshot.getForecasts();
 
             CurrentWeather finalCurrentWeather = currentWeather;
             List<ForecastWeather> finalForecasts = forecasts;
@@ -171,7 +162,7 @@ public class DetailsOfTodayActivity extends BaseActivity {
         windPowerValueView.setText(currentWeather.getWindPower());
         provinceValueView.setText(city.getProvince());
         forecastCountView.setText(getForecastCountText(forecasts));
-        forecastAdapter.submitList(forecasts == null ? Collections.emptyList() : forecasts);
+        forecastAdapter.submitList(forecasts);
 
         applyWeatherTheme(currentWeather.getWeather());
     }

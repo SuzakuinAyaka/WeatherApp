@@ -14,16 +14,16 @@ public class WeatherApiService {
 
     @NonNull
     public String getCurrentWeather(String adCode) throws IOException {
-        return executeGet(ApiConfig.PATH_CURRENT_WEATHER, adCode);
+        return executeGet(ApiConfig.PATH_CURRENT_WEATHER, adCode, ApiConfig.EXTENSIONS_BASE);
     }
 
     @NonNull
     public String getForecastWeather(String adCode) throws IOException {
-        return executeGet(ApiConfig.PATH_FORECAST_WEATHER, adCode);
+        return executeGet(ApiConfig.PATH_FORECAST_WEATHER, adCode, ApiConfig.EXTENSIONS_ALL);
     }
 
     @NonNull
-    private String executeGet(String path, String adCode) throws IOException {
+    private String executeGet(String path, String adCode, String extensions) throws IOException {
         HttpUrl baseUrl = HttpUrl.parse(ApiConfig.BASE_URL + path);
         if (baseUrl == null) {
             throw new IOException("Invalid base url: " + ApiConfig.BASE_URL + path);
@@ -31,7 +31,9 @@ public class WeatherApiService {
 
         HttpUrl url = baseUrl.newBuilder()
                 .addQueryParameter("key", ApiConfig.API_KEY)
-                .addQueryParameter("adcode", adCode)
+                .addQueryParameter("city", adCode)
+                .addQueryParameter("extensions", extensions)
+                .addQueryParameter("output", ApiConfig.OUTPUT_JSON)
                 .build();
 
         Request request = new Request.Builder()

@@ -192,11 +192,17 @@ public class MainActivity extends BaseActivity {
 
             City current = ensureCurrentCity(user.getId());
             List<City> savedCities = cityRepository.getSavedCities(user.getId());
-            CurrentWeather currentWeather = loadCurrentWeather(current, forceRefresh);
-            List<ForecastWeather> forecasts = loadForecasts(current, forceRefresh);
+            WeatherRepository.WeatherSnapshot snapshot =
+                    weatherRepository.getWeatherSnapshot(current, forceRefresh);
+            CurrentWeather currentWeather = snapshot.getCurrentWeather();
+            List<ForecastWeather> forecasts = snapshot.getForecasts();
 
-            MainUiState state = new MainUiState(user, current, savedCities, currentWeather, forecasts);
-            mainHandler.post(() -> renderState(state, snackbarMessage));
+            String message = snackbarMessage;
+            if ((message == null || message.isEmpty()) && snapshot.getMessage() != null && !snapshot.getMessage().isEmpty()) {
+                message = snapshot.getMessage();
+            }
+            MainUiState state = new MainUiState(user, current, savedCities, currentWeather, forecasts, message);
+            mainHandler.post(() -> renderState(state));
         });
     }
 
@@ -210,25 +216,7 @@ public class MainActivity extends BaseActivity {
         return cityRepository.getCurrentCity(userId);
     }
 
-    private CurrentWeather loadCurrentWeather(City city, boolean forceRefresh) {
-        CurrentWeather cached = weatherRepository.getCachedCurrentWeather(city.getAdCode());
-        if (cached == null || forceRefresh) {
-            cached = weatherRepository.createMockCurrentWeather(city.getAdCode(), city.getCityName());
-            weatherRepository.cacheCurrentWeather(cached);
-        }
-        return cached;
-    }
-
-    private List<ForecastWeather> loadForecasts(City city, boolean forceRefresh) {
-        List<ForecastWeather> cached = weatherRepository.getCachedForecastWeather(city.getAdCode());
-        if (cached == null || cached.isEmpty() || forceRefresh) {
-            cached = weatherRepository.createMockForecastWeather(city.getAdCode(), city.getCityName());
-            weatherRepository.cacheForecastWeather(city.getAdCode(), cached);
-        }
-        return cached;
-    }
-
-    private void renderState(MainUiState state, @Nullable String snackbarMessage) {
+    private void renderState(MainUiState state) {
         currentCity = state.currentCity;
         swipeRefreshLayout.setRefreshing(false);
 
@@ -269,8 +257,8 @@ public class MainActivity extends BaseActivity {
         savedCityAdapter.submitList(state.savedCities);
         applyWeatherTheme(weatherText);
 
-        if (snackbarMessage != null && !snackbarMessage.isEmpty()) {
-            Snackbar.make(drawerLayout, snackbarMessage, Snackbar.LENGTH_SHORT).show();
+        if (state.message != null && !state.message.isEmpty()) {
+            Snackbar.make(drawerLayout, state.message, Snackbar.LENGTH_LONG).show();
         }
     }
 
@@ -363,19 +351,23 @@ public class MainActivity extends BaseActivity {
         private final List<City> savedCities;
         private final CurrentWeather currentWeather;
         private final List<ForecastWeather> forecasts;
+        @Nullable
+        private final String message;
 
         private MainUiState(
                 User user,
                 City currentCity,
                 List<City> savedCities,
                 CurrentWeather currentWeather,
-                List<ForecastWeather> forecasts
+                List<ForecastWeather> forecasts,
+                @Nullable String message
         ) {
             this.user = user;
             this.currentCity = currentCity;
             this.savedCities = savedCities;
             this.currentWeather = currentWeather;
             this.forecasts = forecasts;
+            this.message = message;
         }
     }
 }

@@ -1,16 +1,23 @@
 package com.dengyy.weatherapp.repository;
 
 import android.content.Context;
+import android.text.TextUtils;
 
 import androidx.annotation.Nullable;
 
-import com.dengyy.weatherapp.R;
+import com.dengyy.weatherapp.config.ApiConfig;
 import com.dengyy.weatherapp.db.dao.CurrentWeatherDao;
 import com.dengyy.weatherapp.db.dao.ForecastWeatherDao;
+import com.dengyy.weatherapp.model.City;
 import com.dengyy.weatherapp.model.CurrentWeather;
 import com.dengyy.weatherapp.model.ForecastWeather;
+import com.dengyy.weatherapp.network.WeatherApiService;
+import com.dengyy.weatherapp.network.parser.CurrentWeatherParser;
+import com.dengyy.weatherapp.network.parser.ForecastWeatherParser;
+import com.dengyy.weatherapp.utils.NetworkUtils;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class WeatherRepository {
@@ -18,11 +25,17 @@ public class WeatherRepository {
     private final CurrentWeatherDao currentWeatherDao;
     private final ForecastWeatherDao forecastWeatherDao;
     private final Context appContext;
+    private final WeatherApiService weatherApiService;
+    private final CurrentWeatherParser currentWeatherParser;
+    private final ForecastWeatherParser forecastWeatherParser;
 
     public WeatherRepository(Context context) {
         this.appContext = context.getApplicationContext();
         this.currentWeatherDao = new CurrentWeatherDao(appContext);
         this.forecastWeatherDao = new ForecastWeatherDao(appContext);
+        this.weatherApiService = new WeatherApiService();
+        this.currentWeatherParser = new CurrentWeatherParser();
+        this.forecastWeatherParser = new ForecastWeatherParser();
     }
 
     public void cacheCurrentWeather(CurrentWeather weather) {
@@ -42,133 +55,166 @@ public class WeatherRepository {
         return forecastWeatherDao.getByAdCode(adCode);
     }
 
-    public CurrentWeather createMockCurrentWeather(String adCode, String cityName) {
+    public WeatherSnapshot getWeatherSnapshot(City city, boolean forceRefresh) {
+        CurrentWeather cachedCurrent = getCachedCurrentWeather(city.getAdCode());
+        List<ForecastWeather> cachedForecasts = getCachedForecastWeather(city.getAdCode());
+
+        if (!forceRefresh && !NetworkUtils.isConnected(appContext) && cachedCurrent != null) {
+            return new WeatherSnapshot(cachedCurrent, cachedForecasts, true, "Using cached weather data.");
+        }
+
+        if (TextUtils.isEmpty(ApiConfig.API_KEY)) {
+            return fallbackSnapshot(city, cachedCurrent, cachedForecasts, "AMap key is empty. Rebuild the app after updating amap.properties.");
+        }
+
+        try {
+            String forecastJson = weatherApiService.getForecastWeather(city.getAdCode());
+            ForecastWeatherParser.ParseResult forecastResult =
+                    forecastWeatherParser.parse(city.getAdCode(), forecastJson);
+
+            String currentJson = weatherApiService.getCurrentWeather(city.getAdCode());
+            CurrentWeather currentWeather = currentWeatherParser.parse(currentJson);
+
+            enrichCurrentWeather(city, currentWeather, forecastResult.getCityName(), forecastResult.getTodayForecast());
+
+            List<ForecastWeather> forecasts = new ArrayList<>(forecastResult.getFutureForecasts());
+            cacheCurrentWeather(currentWeather);
+            cacheForecastWeather(city.getAdCode(), forecasts);
+            return new WeatherSnapshot(currentWeather, forecasts, false, null);
+        } catch (Exception exception) {
+            return fallbackSnapshot(city, cachedCurrent, cachedForecasts, exception.getMessage());
+        }
+    }
+
+    private void enrichCurrentWeather(
+            City city,
+            CurrentWeather currentWeather,
+            @Nullable String forecastCityName,
+            @Nullable ForecastWeather todayForecast
+    ) {
+        if (TextUtils.isEmpty(currentWeather.getAdCode())) {
+            currentWeather.setAdCode(city.getAdCode());
+        }
+        if (TextUtils.isEmpty(currentWeather.getCityName())) {
+            currentWeather.setCityName(
+                    !TextUtils.isEmpty(forecastCityName) ? forecastCityName : city.getCityName()
+            );
+        }
+        if (todayForecast != null) {
+            currentWeather.setHighTemp(todayForecast.getDayTemp());
+            currentWeather.setLowTemp(todayForecast.getNightTemp());
+        }
+        currentWeather.setCacheTime(System.currentTimeMillis());
+    }
+
+    private WeatherSnapshot fallbackSnapshot(
+            City city,
+            @Nullable CurrentWeather cachedCurrent,
+            @Nullable List<ForecastWeather> cachedForecasts,
+            @Nullable String errorMessage
+    ) {
+        if (looksLikeLegacyMock(city.getAdCode(), cachedCurrent, cachedForecasts)) {
+            cachedCurrent = null;
+            cachedForecasts = null;
+        }
+        CurrentWeather currentWeather = cachedCurrent != null
+                ? cachedCurrent
+                : buildEmptyCurrentWeather(city);
+        List<ForecastWeather> forecasts = cachedForecasts != null
+                ? cachedForecasts
+                : Collections.emptyList();
+        return new WeatherSnapshot(currentWeather, forecasts, true, errorMessage);
+    }
+
+    private CurrentWeather buildEmptyCurrentWeather(City city) {
         CurrentWeather weather = new CurrentWeather();
-        weather.setAdCode(adCode);
-        weather.setCityName(cityName);
-        weather.setWeather(resolveMockWeather(adCode));
-        weather.setTemperature(resolveMockTemperature(adCode));
-        weather.setHumidity(resolveMockHumidity(adCode));
-        weather.setWindDirection(resolveMockWindDirection(adCode));
-        weather.setWindPower(appContext.getString(R.string.wind_power_level));
-        weather.setHighTemp(resolveMockHighTemp(adCode));
-        weather.setLowTemp(resolveMockLowTemp(adCode));
-        weather.setReportTime(resolveMockReportTime(adCode));
+        weather.setAdCode(city.getAdCode());
+        weather.setCityName(city.getCityName());
+        weather.setWeather("--");
+        weather.setTemperature("--");
+        weather.setHumidity("--");
+        weather.setWindDirection("--");
+        weather.setWindPower("--");
+        weather.setHighTemp("--");
+        weather.setLowTemp("--");
+        weather.setReportTime("--");
         weather.setCacheTime(System.currentTimeMillis());
         return weather;
     }
 
-    public List<ForecastWeather> createMockForecastWeather(String adCode, String cityName) {
-        List<ForecastWeather> forecasts = new ArrayList<>();
-        String[] dates = {"周二", "周三", "周四", "周五"};
-        String[] dayWeather = {
-                appContext.getString(R.string.weather_cloudy),
-                appContext.getString(R.string.weather_sunny),
-                appContext.getString(R.string.weather_overcast),
-                appContext.getString(R.string.weather_rain)
-        };
-        for (int i = 0; i < dates.length; i++) {
-            ForecastWeather forecast = new ForecastWeather();
-            forecast.setAdCode(adCode);
-            forecast.setCityName(cityName);
-            forecast.setForecastDate(dates[i]);
-            forecast.setWeek(String.valueOf(i + 1));
-            forecast.setDayWeather(dayWeather[i]);
-            forecast.setNightWeather(appContext.getString(R.string.weather_sunny));
-            forecast.setDayTemp(String.valueOf(27 + i));
-            forecast.setNightTemp(String.valueOf(19 + i));
-            forecast.setDayWind(appContext.getString(R.string.wind_east));
-            forecast.setNightWind(appContext.getString(R.string.wind_north_east));
-            forecast.setDayPower(appContext.getString(R.string.wind_power_level));
-            forecast.setNightPower(appContext.getString(R.string.wind_power_night));
-            forecast.setCacheTime(System.currentTimeMillis());
-            forecasts.add(forecast);
+    private boolean looksLikeLegacyMock(
+            String adCode,
+            @Nullable CurrentWeather currentWeather,
+            @Nullable List<ForecastWeather> forecasts
+    ) {
+        if (currentWeather == null) {
+            return false;
         }
-        return forecasts;
-    }
-
-    private String resolveMockWeather(String adCode) {
+        if ("110100".equals(adCode)) {
+            return isSameWeather(currentWeather, "26", "58", "28", "20", "10:30");
+        }
         if ("310100".equals(adCode)) {
-            return appContext.getString(R.string.weather_rain);
+            return isSameWeather(currentWeather, "22", "88", "24", "19", "09:40");
         }
         if ("510100".equals(adCode)) {
-            return appContext.getString(R.string.weather_cloudy);
+            return isSameWeather(currentWeather, "24", "72", "26", "18", "11:05");
         }
         if ("230100".equals(adCode)) {
-            return appContext.getString(R.string.weather_snow);
+            return isSameWeather(currentWeather, "-8", "64", "-4", "-14", "07:20");
         }
-        return appContext.getString(R.string.weather_sunny);
+        return false;
     }
 
-    private String resolveMockTemperature(String adCode) {
-        if ("310100".equals(adCode)) {
-            return "22";
-        }
-        if ("510100".equals(adCode)) {
-            return "24";
-        }
-        if ("230100".equals(adCode)) {
-            return "-8";
-        }
-        return "26";
+    private boolean isSameWeather(
+            CurrentWeather currentWeather,
+            String temperature,
+            String humidity,
+            String highTemp,
+            String lowTemp,
+            String reportTime
+    ) {
+        return TextUtils.equals(temperature, currentWeather.getTemperature())
+                && TextUtils.equals(humidity, currentWeather.getHumidity())
+                && TextUtils.equals(highTemp, currentWeather.getHighTemp())
+                && TextUtils.equals(lowTemp, currentWeather.getLowTemp())
+                && TextUtils.equals(reportTime, currentWeather.getReportTime());
     }
 
-    private String resolveMockHumidity(String adCode) {
-        if ("310100".equals(adCode)) {
-            return "88";
-        }
-        if ("510100".equals(adCode)) {
-            return "72";
-        }
-        if ("230100".equals(adCode)) {
-            return "64";
-        }
-        return "58";
-    }
+    public static final class WeatherSnapshot {
 
-    private String resolveMockWindDirection(String adCode) {
-        if ("230100".equals(adCode)) {
-            return appContext.getString(R.string.wind_north_east);
-        }
-        return appContext.getString(R.string.wind_east_south);
-    }
+        private final CurrentWeather currentWeather;
+        private final List<ForecastWeather> forecasts;
+        private final boolean fromCache;
+        @Nullable
+        private final String message;
 
-    private String resolveMockHighTemp(String adCode) {
-        if ("310100".equals(adCode)) {
-            return "24";
+        public WeatherSnapshot(
+                CurrentWeather currentWeather,
+                List<ForecastWeather> forecasts,
+                boolean fromCache,
+                @Nullable String message
+        ) {
+            this.currentWeather = currentWeather;
+            this.forecasts = forecasts;
+            this.fromCache = fromCache;
+            this.message = message;
         }
-        if ("510100".equals(adCode)) {
-            return "26";
-        }
-        if ("230100".equals(adCode)) {
-            return "-4";
-        }
-        return "28";
-    }
 
-    private String resolveMockLowTemp(String adCode) {
-        if ("310100".equals(adCode)) {
-            return "19";
+        public CurrentWeather getCurrentWeather() {
+            return currentWeather;
         }
-        if ("510100".equals(adCode)) {
-            return "18";
-        }
-        if ("230100".equals(adCode)) {
-            return "-14";
-        }
-        return "20";
-    }
 
-    private String resolveMockReportTime(String adCode) {
-        if ("310100".equals(adCode)) {
-            return "09:40";
+        public List<ForecastWeather> getForecasts() {
+            return forecasts;
         }
-        if ("510100".equals(adCode)) {
-            return "11:05";
+
+        public boolean isFromCache() {
+            return fromCache;
         }
-        if ("230100".equals(adCode)) {
-            return "07:20";
+
+        @Nullable
+        public String getMessage() {
+            return message;
         }
-        return "10:30";
     }
 }
