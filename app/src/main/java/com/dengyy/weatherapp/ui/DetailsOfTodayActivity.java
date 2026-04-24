@@ -22,6 +22,7 @@ import com.dengyy.weatherapp.repository.UserRepository;
 import com.dengyy.weatherapp.repository.WeatherRepository;
 import com.dengyy.weatherapp.utils.DateUtils;
 import com.dengyy.weatherapp.utils.NetworkUtils;
+import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -31,6 +32,8 @@ import java.util.concurrent.Executors;
 
 public class DetailsOfTodayActivity extends BaseActivity {
 
+    private static final float COLLAPSED_TITLE_THRESHOLD = 0.65f;
+
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
     private UserRepository userRepository;
@@ -38,6 +41,8 @@ public class DetailsOfTodayActivity extends BaseActivity {
     private WeatherRepository weatherRepository;
 
     private View rootView;
+    private AppBarLayout appBarLayout;
+    private View heroContainer;
     private MaterialToolbar toolbar;
     private TextView cityView;
     private TextView provinceView;
@@ -53,6 +58,8 @@ public class DetailsOfTodayActivity extends BaseActivity {
     private TextView forecastCountView;
     private DetailsForecastAdapter forecastAdapter;
     private int latestLoadToken;
+    private float lastCollapseProgress;
+    private String currentCityTitle = "";
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -78,6 +85,8 @@ public class DetailsOfTodayActivity extends BaseActivity {
 
     private void bindViews() {
         rootView = findViewById(R.id.details_root);
+        appBarLayout = findViewById(R.id.details_app_bar);
+        heroContainer = findViewById(R.id.details_hero_container);
         toolbar = findViewById(R.id.toolbar_details);
         cityView = findViewById(R.id.text_details_city);
         provinceView = findViewById(R.id.text_details_province);
@@ -95,6 +104,33 @@ public class DetailsOfTodayActivity extends BaseActivity {
 
     private void setupActions() {
         toolbar.setNavigationOnClickListener(v -> finish());
+        setupCollapseBehavior();
+    }
+
+    private void setupCollapseBehavior() {
+        if (appBarLayout == null) {
+            return;
+        }
+        toolbar.setTitle("");
+        appBarLayout.addOnOffsetChangedListener((appBar, verticalOffset) -> {
+            int totalScrollRange = appBar.getTotalScrollRange();
+            if (totalScrollRange <= 0) {
+                return;
+            }
+            float collapseProgress = Math.min(1f, Math.abs(verticalOffset) / (float) totalScrollRange);
+            lastCollapseProgress = collapseProgress;
+            applyHeaderCollapseState(collapseProgress);
+        });
+    }
+
+    private void applyHeaderCollapseState(float collapseProgress) {
+        boolean showCollapsedTitle = collapseProgress >= COLLAPSED_TITLE_THRESHOLD;
+        toolbar.setTitle(showCollapsedTitle ? currentCityTitle : "");
+        if (heroContainer == null) {
+            return;
+        }
+        float fadeProgress = Math.min(1f, collapseProgress / COLLAPSED_TITLE_THRESHOLD);
+        heroContainer.setAlpha(1f - fadeProgress);
     }
 
     private void setupForecastList() {
@@ -181,7 +217,8 @@ public class DetailsOfTodayActivity extends BaseActivity {
     }
 
     private void render(City city, CurrentWeather currentWeather, List<ForecastWeather> forecasts) {
-        toolbar.setTitle(city.getCityName());
+        currentCityTitle = city.getCityName();
+        applyHeaderCollapseState(lastCollapseProgress);
         cityView.setText(city.getCityName());
         provinceView.setText(city.getProvince());
         weatherView.setText(currentWeather.getWeather());
