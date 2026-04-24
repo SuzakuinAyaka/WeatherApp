@@ -66,24 +66,24 @@
                 android:clipToPadding="false"
                 android:overScrollMode="never">
 
-            <androidx.core.widget.NestedScrollView
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:clipChildren="false"
                 android:clipToPadding="false"
-                android:fillViewport="true"
+                android:orientation="vertical"
                 android:overScrollMode="never">
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:clipChildren="false"
                     android:clipToPadding="false"
                     android:orientation="vertical"
                     android:paddingStart="16dp"
-                    android:paddingTop="8dp"
+                    android:paddingTop="4dp"
                     android:paddingEnd="16dp"
-                                android:paddingBottom="112dp">
+                    android:paddingBottom="12dp">
 
                     <LinearLayout
                         android:id="@+id/card_weather_hero"
@@ -91,8 +91,8 @@
                         android:layout_height="wrap_content"
                         android:gravity="center_horizontal"
                         android:orientation="vertical"
-                        android:paddingTop="10dp"
-                        android:paddingBottom="6dp">
+                        android:paddingTop="4dp"
+                        android:paddingBottom="4dp">
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -175,7 +175,7 @@
                     <com.google.android.material.card.MaterialCardView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="18dp"
+                        android:layout_marginTop="12dp"
                         app:cardBackgroundColor="@color/main_card_surface"
                         app:cardCornerRadius="24dp"
                         app:cardElevation="2dp"
@@ -277,8 +277,9 @@
 
                     <com.google.android.material.card.MaterialCardView
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="18dp"
+                        android:layout_height="0dp"
+                        android:layout_weight="1"
+                        android:layout_marginTop="12dp"
                         app:cardBackgroundColor="@color/main_card_surface_strong"
                         app:cardCornerRadius="24dp"
                         app:cardElevation="2dp"
@@ -288,7 +289,7 @@
 
                         <LinearLayout
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
+                            android:layout_height="match_parent"
                             android:background="@color/main_card_surface_strong"
                             android:orientation="vertical"
                             android:padding="20dp">
@@ -302,13 +303,14 @@
 
                             <FrameLayout
                                 android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="16dp">
+                                android:layout_height="0dp"
+                                android:layout_weight="1"
+                                android:layout_marginTop="12dp">
 
                                 <androidx.recyclerview.widget.RecyclerView
                                     android:id="@+id/recycler_forecast"
                                     android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
+                                    android:layout_height="match_parent"
                                     android:clipToPadding="false"
                                     android:nestedScrollingEnabled="false"
                                     android:overScrollMode="never"
@@ -336,14 +338,14 @@
                         android:id="@+id/button_details"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="18dp"
+                        android:layout_marginTop="12dp"
                         android:layout_marginStart="4dp"
                         android:layout_marginEnd="4dp"
                         android:text="@string/main_view_details_cta"
                         android:textColor="@color/main_on_surface_strong"
                         app:backgroundTint="@color/main_badge_bg" />
                 </LinearLayout>
-            </androidx.core.widget.NestedScrollView>
+            </LinearLayout>
             </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
         </LinearLayout>
     </FrameLayout>
