@@ -23,6 +23,11 @@ public class ForecastWeatherDao {
     }
 
     public void replaceForecasts(String adCode, List<ForecastWeather> forecasts) {
+        if (forecasts == null || forecasts.isEmpty()) {
+            // Keep existing cache when upstream returns an empty list.
+            // This avoids wiping offline fallback data.
+            return;
+        }
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         db.beginTransaction();
         try {
