@@ -47,7 +47,8 @@ WeatherApp 是一个使用 Android 原生技术栈开发的天气应用课程项
 ## 运行方式
 
 1. 使用 Android Studio 打开项目根目录
-2. 等待 Gradle 同步完成
-3. 选择模拟器或真机运行 `app` 模块
+2. 复制项目根目录的 `amap.properties.template` 并将新文件重命名为 `amap.properties` ，填入高德开放平台提供的api
+3. 等待 Gradle 同步完成
+4. 选择模拟器或真机运行 `app` 模块
 
 当前运行后会进入登录页，登录成功后可进入主界面体验已实现的天气与城市管理流程。
