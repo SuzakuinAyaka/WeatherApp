@@ -39,13 +39,7 @@ public class ForecastAdapter extends RecyclerView.Adapter<ForecastAdapter.ViewHo
         ForecastWeather item = items.get(position);
         holder.dayView.setText(item.getForecastDate());
         holder.weatherView.setText(item.getDayWeather());
-        holder.tempView.setText(
-                holder.itemView.getContext().getString(
-                        R.string.main_high_low,
-                        item.getDayTemp(),
-                        item.getNightTemp()
-                )
-        );
+        holder.tempView.setText(item.getDayTemp() + "/" + item.getNightTemp());
         holder.windView.setText(item.getDayWind() + " · " + item.getDayPower());
     }
 
